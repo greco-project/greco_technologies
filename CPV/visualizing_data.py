@@ -1,11 +1,4 @@
-# built-in python modules
-import os
-import inspect
-import datetime
 
-# scientific python add-ons
-import numpy as np
-import pandas as pd
 
 # plotting stuff
 import matplotlib.pyplot as plt
@@ -16,8 +9,6 @@ try:
 except ImportError:
     print('We suggest you install seaborn using conda or pip and rerun this cell')
 
-# finally, we import the pvlib library
-import pvlib
 
 
 
