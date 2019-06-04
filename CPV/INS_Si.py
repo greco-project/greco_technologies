@@ -15,6 +15,8 @@ import pvlib.solarposition
 import pvlib.atmosphere
 import pvlib.irradiance
 
+import pvlib_CPVsystem as cpv
+
 
 
 def INS_Si_prepare_weather(weather_loc, lat, lon, surface_tilt, surface_azimuth):
@@ -85,12 +87,20 @@ def INS_Si_prepare_weather(weather_loc, lat, lon, surface_tilt, surface_azimuth)
     # calculate DNI
     # prepare weather data for AOI >< 60° and change DNI values accordingly
     aoi_list = pd.Series(name='aoi')
+    dni_ot = pd.Series(name='ot_dni')
     for index, row in spa_python.iterrows():
         aoi = pvlib.irradiance.aoi(surface_tilt=surface_tilt,
                                    surface_azimuth=surface_azimuth,
                                    solar_zenith=row['zenith'],
                                    solar_azimuth=row['azimuth'])
+        w_ot=weather_loc[weather_loc.index == index]
+        ot=cpv.optical_transmission_losses(dni=w_ot['dni'].values[0], aoi=aoi)
+
         aoi_list[index] = aoi
+        dni_ot[index]= ot
+
+    weather_loc['dni_ot']=dni_ot
+
 
     smallaoi = aoi_list[aoi_list < 60]
     bigaoi = aoi_list[aoi_list > 60]
