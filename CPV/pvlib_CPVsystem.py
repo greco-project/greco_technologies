@@ -35,17 +35,21 @@ def glass_transmission_losses(aoi): #todo: find mistake for aoi=59°
     glass_ar_offset = 0.015
     n1 = 1.0
     n2 = 1.5
-    aoi=150
 
-    Rs = abs((n1 * math.cos(math.radians(aoi)) - n2 * np.sqrt(1-((n1/n2) * np.sin(math.radians(aoi)))**2.0))/
-             (n1 * np.cos(math.radians(aoi)) + n2 * np.sqrt(1-((n1/n2) * np.sin(math.radians(aoi)))**2.0)))**2
+    if aoi <= 90:
+        theta = aoi
+    else:
+        return 0
 
-    Rp= abs((n1 * np.sqrt(1 - ((n1/n2) * np.sin(math.radians(aoi)))**2.0) - n2 * np.cos(math.radians(aoi)))/
-            (n1 * np.sqrt(1 - ((n1/n2) * np.sin(math.radians(aoi)))**2.0) + n2 * np.cos(math.radians(aoi))))**2
+    Rs = abs((n1 * math.cos(math.radians(theta)) - n2 * np.sqrt(1-((n1/n2) * np.sin(math.radians(theta)))**2.0))/
+             (n1 * np.cos(math.radians(theta)) + n2 * np.sqrt(1-((n1/n2) * np.sin(math.radians(theta)))**2.0)))**2
+
+    Rp= abs((n1 * np.sqrt(1 - ((n1/n2) * np.sin(math.radians(theta)))**2.0) - n2 * np.cos(math.radians(theta)))/
+            (n1 * np.sqrt(1 - ((n1/n2) * np.sin(math.radians(theta)))**2.0) + n2 * np.cos(math.radians(theta))))**2
 
     Reff= 0.5 *(Rs + Rp)
     glass_transmission = (1.0 - Reff + glass_ar_offset)**2
-    return Reff
+    return glass_transmission
 
 def ufam(am):
 
@@ -113,5 +117,6 @@ if __name__ == "__main__":
     #gt=glass_transmission_losses(aoi)
     #print(gt)
     get=pd.DataFrame.from_dict(aoi_list, orient='index')
+    print(get)
     plt.plot(get)
     plt.show()
