@@ -83,6 +83,7 @@ def INS_Si_prepare_weather(weather_loc, lat, lon, surface_tilt, surface_azimuth)
                                    surface_azimuth=surface_azimuth,
                                    solar_zenith=row['zenith'],
                                    solar_azimuth=row['azimuth'])
+        # calculate optical losses
         w_ot=weather_loc[weather_loc.index == index]
         ot=cpv.optical_transmission_losses(dni=w_ot['dni'].values[0], aoi=aoi)
 
