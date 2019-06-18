@@ -77,21 +77,21 @@ def INS_Si_prepare_weather(weather_loc, lat, lon, surface_tilt, surface_azimuth)
     # calculate DNI
     # prepare weather data for AOI >< 60° and change DNI values accordingly
     aoi_list = pd.Series(name='aoi')
-    dni_ot = pd.Series(name='ot_dni')
+    gt_list = pd.Series(name='gt')
     for index, row in spa_python.iterrows():
         aoi = pvlib.irradiance.aoi(surface_tilt=surface_tilt,
                                    surface_azimuth=surface_azimuth,
                                    solar_zenith=row['zenith'],
                                    solar_azimuth=row['azimuth'])
         # calculate optical losses
-        w_ot=weather_loc[weather_loc.index == index]
-        ot=cpv.optical_transmission_losses(dni=w_ot['dni'].values[0], aoi=aoi)
+        gt=cpv.glass_transmission_losses(aoi)
 
         aoi_list[index] = aoi
-        dni_ot[index]= ot
+        gt_list[index] = gt
 
-    weather_loc['dni_ot']=dni_ot
-
+    weather_loc['dni-gt']= weather_loc['dni']*gt
+    weather_loc['aoi'] = aoi_list
+    weather_loc['gt'] = gt_list
 
     smallaoi = aoi_list[aoi_list < 60]
     bigaoi = aoi_list[aoi_list > 60]
