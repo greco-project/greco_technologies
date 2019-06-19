@@ -13,7 +13,7 @@ import pandas as pd
 # - sapm_effective_irradiance()
 # - sapm_celltemp() todo: does the cell temperature change?
 
-def hybrid_spectral_loss(airmass_absolute, module):
+def diffuse_spectral_loss(airmass_absolute, module):
     """
     Calculates the hybrid spectral loss coefficient, F1.
 
@@ -52,7 +52,7 @@ def hybrid_spectral_loss(airmass_absolute, module):
     return spectral_loss
 
 
-def hybrid_aoi_loss(aoi, module, upper=None):
+def diffuse_aoi_loss(aoi, module, upper=None):
     """
     Calculates the hybrid angle of incidence loss coefficient, F2.
 
@@ -113,7 +113,7 @@ def hybrid_aoi_loss(aoi, module, upper=None):
     return aoi_loss
 
 
-def hybrid_effective_irradiance(poa_direct, poa_diffuse, airmass_absolute, aoi,
+def diffuse_effective_irradiance(poa_direct, poa_diffuse, airmass_absolute, aoi,
                               module, reference_irradiance=1000):
     """
     Calculates the SAPM effective irradiance using the SAPM spectral
@@ -241,10 +241,3 @@ def sapm_celltemp(poa_global, wind_speed, temp_air,
 
     return pd.DataFrame({'temp_cell': temp_cell, 'temp_module': temp_module})
 
-
-def ot_losses(optical_transmission, DNI, DHI):
-
-    '''
-    This function accounts for the case that the optical transmission of irradiation
-    is changes e.g. by a lens.
-    '''
