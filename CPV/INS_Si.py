@@ -13,14 +13,15 @@ def INS_Si_prepare_weather(weather_loc, lat, lon, surface_tilt, surface_azimuth)
     '''
 
     This function prepares the given weather data (in the form of PVLib) to the
-     special case of INS_Si flatplate module.
+     special case of INS_Si flatplate module. It includes galass transmission
+     losses due to the fresnel lense and DNI-dependency of AOI:
 
     For AOI < 60° -> DNI=0, DHI is calculating using the perez-approach
 
-    For API > 60° -> DNI=DNI, DHI is calculating using the perez-approach
+    For API > 60° -> DHI is calculating using the perez-approach
 
-    todo: include transmission curve
-    todo: check if DNI=0 for AOI<60°
+
+
 
 
     :param weather_loc: pd.DataFrame with columns defined for the PVLib
@@ -90,8 +91,7 @@ def INS_Si_prepare_weather(weather_loc, lat, lon, surface_tilt, surface_azimuth)
         gt_list[index] = gt
 
     weather_loc['dni-gt']= weather_loc['dni']*gt
-    weather_loc['aoi'] = aoi_list
-    weather_loc['gt'] = gt_list
+
 
     smallaoi = aoi_list[aoi_list < 60]
     bigaoi = aoi_list[aoi_list > 60]
