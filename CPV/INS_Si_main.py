@@ -10,11 +10,10 @@ import pvlib.atmosphere
 import pvlib.pvsystem as pvsystem
 
 import INS_Si
-#import flatplate_SAPM_effective_irradiance as eff
 import visualizing_data
 
-# this scipt loads weather data and prepares it regarding the special setup of
-# the Insolight-SI module for AOI <> 60°
+# this scipt loads weather data and calculates the output current of the Insolight
+# -SI Module
 
 
 
@@ -22,7 +21,7 @@ import visualizing_data
 surface_tilt= 20
 surface_azimuth= 180
 
-#LOAD WEATHER DATA
+#LOAD  DUMMY WEATHER DATA
 filename = os.path.abspath(
             "/home/local/RL-INSTITUT/inia.steinbach/rl-institut/04_Projekte/163_Open_FRED/03-Projektinhalte/AP2 Wetterdaten/open_FRED_TestWetterdaten_csv/fred_data_test_2016.csv")
 weather_df = pd.read_csv(filename, skiprows=range(1, 50), nrows=(5000),
@@ -31,7 +30,6 @@ weather_df = pd.read_csv(filename, skiprows=range(1, 50), nrows=(5000),
                                                                         utc=True))
 weather_df.index = pd.to_datetime(weather_df.index).tz_convert(
             'Europe/Berlin')
-# calculate ghi
 weather_df['ghi'] = weather_df.dirhi + weather_df.dhi
 #weather = weather_df[['wind_speed', 'temp_air', 'P', 'dhi', 'dirhi', 'ghi']]
 coordinates = weather_df.loc[:, ["lat", "lon"]].values
@@ -40,23 +38,17 @@ coordinates = weather_df.loc[:, ["lat", "lon"]].values
 
 for lat, lon in coordinates:
 
-    #set up module
-    cpv_module = pd.read_csv(
-        '/home/local/RL-INSTITUT/inia.steinbach/rl-institut/04_Projekte/220_GRECO/03-Projektinhalte/AP4_High_Penetration_of_Photovoltaics/T4_3_CPV/Parameters/CPV_parameters2.csv',
-        sep=',', encoding='utf-7', converters={"Name": str, "CPV": float})
+    #set up dummy module
     sandia_modules = pvlib.pvsystem.retrieve_sam('SandiaMod')
     sandia_module = sandia_modules['Canadian_Solar_CS5P_220M___2009_']
     cec_inverters = pvlib.pvsystem.retrieve_sam('cecinverter')
     inverter_parameters = cec_inverters[
         'ABB__MICRO_0_25_I_OUTD_US_208_208V__CEC_2014_']
-    df = cpv_module
-    df = df.set_index('Name')
-    df = df['CPV']
     system = PVSystem(surface_tilt=20, surface_azimuth=200,
                       module_parameters=sandia_module,
                       inverter_parameters=inverter_parameters)
-    location = Location(latitude=lat, longitude=lon)
 
+    # filter weather dataset for the location
     weather_loc = weather_df.loc[(weather_df['lat'] == lat) # kann das weg?
                                   & (weather_df['lon'] == lon)]
     location=Location(latitude=lat, longitude=lon)
