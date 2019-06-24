@@ -6,6 +6,7 @@ from pvlib.location import Location
 
 import pvlib.atmosphere
 import pvlib.pvsystem as pvsystem
+import pvlib.irradiance as irrad
 
 import pvlib_CPVsystem as cpv
 import visualizing_data
@@ -38,7 +39,7 @@ for lat, lon in coordinates:
     cpv_module = pd.read_csv(
         '/home/local/RL-INSTITUT/inia.steinbach/rl-institut/04_Projekte/220_GRECO/03-Projektinhalte/AP4_High_Penetration_of_Photovoltaics/T4_3_CPV/Parameters/CPV_parameters2.csv',
         sep=',', encoding='utf-7', converters={"Name": str, "CPV": float})
-    sandia_modules = pvlib.pvsystem.retrieve_sam('SandiaMod')
+    sandia_modules = pvsystem.retrieve_sam('SandiaMod')
     sandia_module = sandia_modules['Canadian_Solar_CS5P_220M___2009_']
     cec_inverters = pvlib.pvsystem.retrieve_sam('cecinverter')
     inverter_parameters = cec_inverters[
@@ -89,9 +90,31 @@ for lat, lon in coordinates:
     weather_loc['glass_transmission']=gt_list
 
     # CALCULATE THE DNI AFTER THE UTILIZATION FACTOR
-    weather_loc['dni_uf']= cpv.UF_corrected_DNI(am=absolute_airmass, t_ambient=weather_loc['temp_air'], dni=weather_loc['dni_losses']) #todo: check coefficients
+#    weather_loc['dni_uf']= cpv.UF_corrected_DNI(am=absolute_airmass, t_ambient=weather_loc['temp_air'], dni=weather_loc['dni_losses']) #todo: check coefficients
 
 
+    #CALCULATE POA COMPONENTS
+    prepared_poas= irrad.poa_components(aoi=weather_loc['aoi'], dni=weather_loc['dni_losses'], poa_sky_diffuse=0, poa_ground_diffuse=0)
+
+    effective_irradiance = pvsystem.sapm_effective_irradiance(poa_direct=prepared_poas['poa_direct'],
+                                                        poa_diffuse=prepared_poas['poa_diffuse'],
+                                                        airmass_absolute = absolute_airmass['airmass'],
+                                                        aoi= weather_loc['aoi'],
+                                                        module=sandia_module,
+                                                        reference_irradiance=1000)
+
+    temp_cell= pvsystem.sapm_celltemp(poa_global=prepared_poas['poa_global'],
+                                      wind_speed=weather_loc['wind_speed'],
+                                      temp_air=weather_loc['temp_air'],
+                                      model='open_rack_cell_glassback') # todo: adjust model
+    # CALCULATE OUTPUT
+    output= pvsystem.sapm(effective_irradiance=effective_irradiance,
+                     temp_cell=temp_cell['temp_cell'],
+                     module=sandia_module)
+
+
+    visualizing_data.plot_sapm(output, effective_irradiance)
     break
+
 
 
