@@ -9,7 +9,9 @@ import pvlib.pvsystem as pvsystem
 import pvlib.irradiance as irrad
 
 import pvlib_CPVsystem as cpv
+from pvlib_CPVsystem import StaticCPVSystem
 import visualizing_data
+import matplotlib.pyplot as plt
 
 
 
@@ -35,42 +37,44 @@ coordinates = weather_df.loc[:, ["lat", "lon"]].values
 
 for lat, lon in coordinates:
 
-    #set up CPV-module
-    cpv_module = pd.read_csv(
-        '/home/local/RL-INSTITUT/inia.steinbach/rl-institut/04_Projekte/220_GRECO/03-Projektinhalte/AP4_High_Penetration_of_Photovoltaics/T4_3_CPV/Parameters/CPV_parameters2.csv',
-        sep=',', encoding='utf-7', converters={"Name": str, "CPV": float})
-    sandia_modules = pvsystem.retrieve_sam('SandiaMod')
-    sandia_module = sandia_modules['Canadian_Solar_CS5P_220M___2009_']
-    cec_inverters = pvlib.pvsystem.retrieve_sam('cecinverter')
-    inverter_parameters = cec_inverters[
-        'ABB__MICRO_0_25_I_OUTD_US_208_208V__CEC_2014_']
-    df = cpv_module
-    df = df.set_index('Name')
-    df = df['CPV']
-    system = PVSystem(surface_tilt=20, surface_azimuth=200,
-                      module_parameters=sandia_module,
-                      inverter_parameters=inverter_parameters)
     location = Location(latitude=lat, longitude=lon)
 
+    # FILTER WEATHER
+    weather_loc = weather_df.loc[(weather_df['lat'] == lat)  # kann das weg?
+                                 & (weather_df['lon'] == lon)]
+    location = Location(latitude=lat, longitude=lon)
+    times = weather_loc.index  # kann das weg?
 
-    #FILTER WEATHER
-    weather_loc = weather_df.loc[(weather_df['lat'] == lat) # kann das weg?
-                                  & (weather_df['lon'] == lon)]
-    location=Location(latitude=lat, longitude=lon)
-    times=weather_loc.index #kann das weg?
 
-    # CALCULATE AIRMASS
+    #set up CPV-module
+
+    module_params = {'gamma_ref': 4.456, 'mu_gamma': 0.0012, 'I_L_ref': 3.346,
+                     'I_o_ref': 0.000000000004, 'R_sh_ref': 4400,
+                     'R_sh_0': 17500, 'R_sh_exp': 5.50, 'R_s': 0.736,
+                     'alpha_sc': 0.00, 'irrad_ref': 1000, 'temp_ref': 25,
+                     'cells_in_series': 42}
+
+    csys = StaticCPVSystem(module=None, module_parameters=module_params,
+                         modules_per_string=1, strings_per_inverter=1,
+                         inverter=None, inverter_parameters=None,
+                         racking_model='freestanding',
+                         losses_parameters=None, name=None)
+
+    celltemp = csys.pvsyst_celltemp(weather_loc['ghi'],
+                                    weather_loc['temp_air'],
+                                    weather_loc['wind_speed'])
+
+#    DNIseries=weather_loc['dni']
+#    DNI=DNIseries.to_numpy()
+
+
+    # calculate airmass
+    airmass = location.get_airmass(times)
+    relative_airmass= airmass['airmass_relative'].fillna(0)
+
+    # calculate aoi, optical transmission losses and glass transmission losses
     spa_python = pvlib.solarposition.spa_python(time=times, latitude=lat,
                                                 longitude=lon)
-    zenith = spa_python[['zenith']].fillna(0)
-    airmass_rel = pvlib.atmosphere.get_relative_airmass(zenith)
-    airmass_relative = pd.DataFrame(data=airmass_rel, index=times,
-                               columns=['airmass']).fillna(0)
-    absolute_airmass = pvlib.atmosphere.get_absolute_airmass(airmass_relative,
-                                                             pressure=101325.)
-
-    # CALCULATE AOI AND OPTICAL TRANSMISSION LOSSES RELATED TO AOI AND OPTICAL
-    # TRANSMISSION LOSSES
     aoi_list = pd.Series(name='aoi')
     ot_list = pd.Series(name='ot')
     gt_list = pd.Series(name='gt')
@@ -84,36 +88,34 @@ for lat, lon in coordinates:
         ot_list[index]=cpv.optical_transmission_losses(aoi=aoi)
         gt_list[index]=cpv.glass_transmission_losses(aoi=aoi)
 
-    alignement_transmission = 0.95
-    weather_loc['dni_losses']= weather_loc['dni']*ot_list*gt_list * alignement_transmission
+    alignement_transmission = 0.95 #emperical parameter for Insolight module
     weather_loc['aoi']=aoi_list
     weather_loc['glass_transmission']=gt_list
+    weather_loc['dni_after_losses'] = weather_loc[
+                        'dni'] * ot_list * gt_list * alignement_transmission
 
-    # CALCULATE THE DNI AFTER THE UTILIZATION FACTOR
-#    weather_loc['dni_uf']= cpv.UF_corrected_DNI(am=absolute_airmass, t_ambient=weather_loc['temp_air'], dni=weather_loc['dni_losses']) #todo: check coefficients
-
-
-    #CALCULATE POA COMPONENTS
-    prepared_poas= irrad.poa_components(aoi=weather_loc['aoi'], dni=weather_loc['dni_losses'], poa_sky_diffuse=0, poa_ground_diffuse=0)
-
-    effective_irradiance = pvsystem.sapm_effective_irradiance(poa_direct=prepared_poas['poa_direct'],
-                                                        poa_diffuse=prepared_poas['poa_diffuse'],
-                                                        airmass_absolute = absolute_airmass['airmass'],
-                                                        aoi= weather_loc['aoi'],
-                                                        module=sandia_module,
-                                                        reference_irradiance=1000)
-
-    temp_cell= pvsystem.sapm_celltemp(poa_global=prepared_poas['poa_global'],
-                                      wind_speed=weather_loc['wind_speed'],
-                                      temp_air=weather_loc['temp_air'],
-                                      model='open_rack_cell_glassback') # todo: adjust model
-    # CALCULATE OUTPUT
-    output= pvsystem.sapm(effective_irradiance=effective_irradiance,
-                     temp_cell=temp_cell['temp_cell'],
-                     module=sandia_module)
+    # calculate DNI after the utilization factor
+    weather_loc['dni_uf']= cpv.calculate_utilization_factor(
+                               am=relative_airmass,
+                               t_ambient=weather_loc['temp_air'],
+                               dni=weather_loc['dni_after_losses'],
+                                calculate_ufdni=False) #todo: check coefficients
 
 
-    visualizing_data.plot_sapm(output, effective_irradiance)
+    (photocurrent, saturation_current, resistance_series,
+     resistance_shunt, nNsVth) = (csys.calcparams_pvsyst(weather_loc['dni_uf'],
+                                                         celltemp))
+
+    csys.diode_params = (photocurrent, saturation_current, resistance_series,
+                         resistance_shunt, nNsVth)
+
+    csys.dc = csys.singlediode(photocurrent, saturation_current,
+                               resistance_series,
+                               resistance_shunt, nNsVth)
+
+
+    plt.plot(csys.dc)
+    plt.show()
     break
 
 
