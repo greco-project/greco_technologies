@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import datetime
 
 df= pd.read_csv('/home/local/RL-INSTITUT/inia.steinbach/Dokumente/CPV/data/m300_data_filtered.txt', header=None)
-columnnames= pd.read_csv('/home/local/RL-INSTITUT/inia.steinbach/rl-institut/04_Projekte/220_GRECO/03-Projektinhalte/AP4_High_Penetration_of_Photovoltaics/T4_3_CPV/datasheets_commercial_CPV/m300_measurements_headers.csv', sep=',', dtype={'Daytime':str})
+columnnames= pd.read_csv('/home/local/RL-INSTITUT/inia.steinbach/rl-institut/04_Projekte/220_GRECO/04-Berichte/03-Projektinhalte/AP4_High_Penetration_of_Photovoltaics/T4_3_CPV/datasheets_commercial_CPV/m300_measurements_headers.csv', sep=',', dtype={'Daytime':str})
 n=columnnames.columns.tolist()
 df.columns = n
 
@@ -56,7 +56,7 @@ csys.dc = csys.singlediode(photocurrent, saturation_current,
                            resistance_series,
                            resistance_shunt, nNsVth)
 
-real_power = df['Isc']
+real_power = df['Isc']*100
 estimation = csys.dc['p_mp']
 
 
@@ -64,29 +64,64 @@ estimation = csys.dc['p_mp']
 airmass = location.get_airmass(df['Datetime'])
 relative_airmass= airmass['airmass_relative'].fillna(0)
 
-uf_am=cpv.ufam(relative_airmass)
-uf_tamb=cpv.ufam(df['AirTemperature'])
+# calculate single utilization factors
+
+thld_am = 2.022411098853249
+m_low_am = 0.0423037910485609
+m_high_am = -0.0210539236615148
+
+uf_am = []
+for i, v in relative_airmass.items():
+    uf_am.append(cpv.get_single_util_factor(v, thld_am,
+                                            m_low_am, m_high_am))
+
+
+thld_temp = 200
+m_low_temp = 0.000923828521724516
+m_high_temp = 0.0
+
+uf_temp = []
+for i, v in df['AirTemperature'].items():
+    uf_temp.append(cpv.get_single_util_factor(v, thld_temp,
+                                            m_low_temp, m_high_temp))
+
 
 weight_am_final = 1.0
 rmsd = 10000
+rmsd_list=[]
 
-for weight_am in np.arange(0, 5, 0.1):
-    for weight_tamb in np.arange(0,5,0.1):
+for weight_am in np.arange(0, 1, 0.05):
+    weight_temp = 1.0 - weight_am
 
-        modeled_power = estimation * (np.multiply(weight_am, uf_am) +
-                                  np.multiply(weight_tamb, uf_tamb))
-        rmsd_temp = math.sqrt(mean_squared_error(real_power, modeled_power))
-
-        if rmsd_temp < rmsd:
-            weight_am_final = weight_am
-            weight_tamb_final=weight_tamb
-            rmsd = rmsd_temp
+    modeled_power = estimation * (np.multiply(weight_am, uf_am) +
+                                  np.multiply(weight_temp, uf_temp))
+    rmsd_temp = math.sqrt(mean_squared_error(real_power, modeled_power))
+    rmsd_list.append(rmsd_temp)
+    if rmsd_temp < rmsd:
+        weight_am_final = weight_am
+        weight_temp_final = weight_temp
+        rmsd = rmsd_temp
 
 modeled_power = estimation * (np.multiply(weight_am_final, uf_am) +
-                                  np.multiply(weight_tamb_final, uf_tamb))
+                                  np.multiply(weight_temp_final, uf_temp))
 
+residualUF = real_power - modeled_power
+residualwithoutUF= real_power - estimation
 
-plt.plot(real_power, 'r', label='real_power')
-plt.plot(modeled_power, 'b', label='modeled_power')
+ plt.plot(real_power, 'r', label='real_power')
+plt.plot(estimation, 'g', label='estimation')
+#plt.plot(modeled_power, 'b', label='modeled_power')
+plt.show()
+plt.plot(real_power,modeled_power, 'bo', markersize=1, label='modeled_power with UF over measured power')
+plt.plot(real_power, estimation,'ro', markersize=1, label='modeled_power_without UF over measured power')
+plt.plot(real_power, real_power, 'g')
+plt.legend()
+plt.show()
+plt.plot(airmass['airmass_relative'], residualwithoutUF, 'go', markersize=1, label='Airmass residual without UF')
+plt.plot(airmass['airmass_relative'].fillna(0), residualUF, 'ro', markersize=1, label='Airmass residual with UF')
+plt.legend()
+plt.show()
+plt.plot(df['AirTemperature'], residualUF, 'ro', markersize=1, label='Temperature residual with UF')
+plt.plot(df['AirTemperature'], residualwithoutUF, 'go', markersize=1, label='Temperature residual without UF')
 plt.legend()
 plt.show()
