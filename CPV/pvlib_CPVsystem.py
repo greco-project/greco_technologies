@@ -442,7 +442,39 @@ def uftamb(t_ambient):
 
     return t0 + t1 * t_ambient
 
-def calculate_utilization_factor(am, t_ambient, dni, calculate_ufdni=False):
+def get_single_util_factor(x, thld, m_low, m_high):
+    """
+    Retrieves the utilization factor for a variable.
+
+    Parameters
+    ----------
+    x : variable value for the utilization factor calc.
+
+    thld : numeric
+        limit between the two regression lines of the utilization factor.
+
+    m_low : numeric
+        inclination of the first regression line of the utilization factor.
+
+    m_high : numeric
+        inclination of the second regression line of the utilization factor.
+
+    Returns
+    -------
+    single_uf : numeric
+        utilization factor for the x variable.
+    """
+
+    if x <= thld:
+        single_uf = 1 + (x - thld) * m_low
+
+    else:
+        single_uf = 1 + (x - thld) * m_high
+
+    return single_uf
+
+
+def calculate_utilization_factor(uf_am, uf_temp, weight_am, weight_temp, calculate_ufdni=False):
 
     '''
     The approach follows the model of Gerstmaier (Quelle), promoting a Utilization Faktor
@@ -467,22 +499,15 @@ def calculate_utilization_factor(am, t_ambient, dni, calculate_ufdni=False):
             cells
     '''
 
-    uf_am = ufam(am)
-    uf_dni = ufdni(dni)
-    uf_tamb = uftamb(t_ambient)
-    c1 = 0.3
-    c2 = 0
-    c3 = 2.4
     #    UF = c1 * uf_am + c2 * uf_dni + c3 * uf_tamb
 
     # calculate weights
     if not calculate_ufdni:
-        UF_corrected_dni = dni * (np.multiply(c1, uf_am) + np.multiply(c3, uf_tamb))
+        UF = np.multiply(weight_am, uf_am) + np.multiply(weight_temp, uf_temp)
     else:
-        UF_corrected_dni = dni * (np.multiply(c1, uf_am) +np.multiply(c2, uf_dni)+ np.multiply(c3, uf_tamb))
+        UF = np.multiply(weight_am, uf_am) +np.multiply(weight_dni, uf_dni)+ np.multiply(weight_temp, uf_temp)
 
-    return UF_corrected_dni
-
+    return UF
 
 if __name__ == "__main__":
 
