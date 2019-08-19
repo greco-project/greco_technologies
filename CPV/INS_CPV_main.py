@@ -94,16 +94,35 @@ for lat, lon in coordinates:
     weather_loc['dni_after_losses'] = weather_loc[
                         'dni'] * ot_list * gt_list * alignement_transmission
 
-    # calculate DNI after the utilization factor
-    weather_loc['dni_uf']= cpv.calculate_utilization_factor(
-                               am=relative_airmass,
-                               t_ambient=weather_loc['temp_air'],
-                               dni=weather_loc['dni_after_losses'],
-                                calculate_ufdni=False) #todo: check coefficients
+    # calculate single utilization factors
+
+    thld_am = 2.022411098853249
+    m_low_am = 0.0423037910485609
+    m_high_am = -0.0210539236615148
+
+    uf_am = []
+    for i, v in relative_airmass.items():
+        uf_am.append(cpv.get_single_util_factor(v, thld_am,
+                                                m_low_am, m_high_am))
+
+    thld_temp = 200
+    m_low_temp = 0.000923828521724516
+    m_high_temp = 0.0
+
+    uf_temp = []
+    for i, v in weather_loc['temp_air'].items():
+        uf_temp.append(cpv.get_single_util_factor(v, thld_temp,
+                                                  m_low_temp, m_high_temp))
+
+    weight_am=0.2
+    weight_temp=0.8
+
+    UF=cpv.calculate_utilization_factor(uf_am, uf_temp, weight_am, weight_temp,
+                                 calculate_ufdni=False)
 
 
     (photocurrent, saturation_current, resistance_series,
-     resistance_shunt, nNsVth) = (csys.calcparams_pvsyst(weather_loc['dni_uf'],
+     resistance_shunt, nNsVth) = (csys.calcparams_pvsyst(weather_loc['dni_after_losses'],
                                                          celltemp))
 
     csys.diode_params = (photocurrent, saturation_current, resistance_series,
@@ -113,10 +132,14 @@ for lat, lon in coordinates:
                                resistance_series,
                                resistance_shunt, nNsVth)
 
+    estimation = csys.dc['p_mp']
+    modeled_power = estimation * UF
 
-    plt.plot(csys.dc)
+    plt.plot(estimation, 'g', label='estimation')
+    plt.plot(modeled_power, 'b', label='modeled_power')
+#    plt.plot(estimation, modeled_power, 'b', label='modeled_power')
+    plt.legend()
     plt.show()
     break
-
 
 
