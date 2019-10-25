@@ -70,7 +70,7 @@ for lat, lon in coordinates:
 
     # calculate airmass
     airmass = location.get_airmass(times)
-    relative_airmass= airmass['airmass_relative'].fillna(0)
+    weather_loc['airmass']= airmass['airmass_relative'].fillna(0)
 
     # calculate aoi, optical transmission losses and glass transmission losses
     spa_python = pvlib.solarposition.spa_python(time=times, latitude=lat,
@@ -101,7 +101,7 @@ for lat, lon in coordinates:
     m_high_am = -0.0210539236615148
 
     uf_am = []
-    for i, v in relative_airmass.items():
+    for i, v in weather_loc['airmass'].items():
         uf_am.append(cpv.get_single_util_factor(v, thld_am,
                                                 m_low_am, m_high_am))
 
@@ -141,3 +141,5 @@ for lat, lon in coordinates:
     plt.legend()
     plt.show()
     break
+
+

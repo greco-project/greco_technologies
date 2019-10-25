@@ -1,6 +1,6 @@
 # Carga y Procesado de Datos sin influencia de la Temperatura Ambiente
 import numpy as np
-import data_preprocessing_fuctions as pre
+import regression_analysis as reg
 
 # Cálculos de la Masa de Aire
 import numpy as np
@@ -59,7 +59,7 @@ for i in np.arange(1,2.8,0.1):
         IscDNI_medians.append(stats.median(array_aux1))
         Airmass_aux.append(i)
 
-m_low, n_low, m_high, n_high, thld = pre.calc_two_regression_lines(Airmass_aux,
+m_low, n_low, m_high, n_high, thld = reg.calc_two_regression_lines(Airmass_aux,
                                                                IscDNI_medians,
                                                                limit = 2.1)
 #m_low, n_low, error1 = calc_regression_line(Airmass_aux[:10],
@@ -85,8 +85,11 @@ print("thld_am = ", thld, '\n'
       'm_high_am = ', m_high/IscDNI_ast)
 
 for i in range(len(airmass_array)):
-    uf_am.append(pre.get_single_util_factor(airmass_array[i], thld,
+    uf_am.append(reg.get_single_util_factor(airmass_array[i], thld,
                                         m_low/IscDNI_ast, m_high/IscDNI_ast))
+
+plt.plot(uf_am)
+plt.show()
 
 # Carga y Procesado de Datos sin influencia de la Masa de Aire
 
@@ -95,7 +98,7 @@ nonairmass_data = np.loadtxt('/home/local/RL-INSTITUT/inia.steinbach/Dokumente/C
 
 nonairmass_IscDNI = nonairmass_data[:, 25]
 nonairmass_temp = nonairmass_data[:, 10]
-m_low, n_low, m_high, n_high, thld = pre.calc_uf_lines(nonairmass_temp,
+m_low, n_low, m_high, n_high, thld = reg.calc_uf_lines(nonairmass_temp,
                                                    nonairmass_IscDNI,
                                                    'temp_air')
 
@@ -103,7 +106,7 @@ AmbientTemp = data[:,10]
 
 uf_at = []
 for i in range(len(airmass_array)):
-    uf_at.append(pre.get_single_util_factor(AmbientTemp[i], thld,
+    uf_at.append(reg.get_single_util_factor(AmbientTemp[i], thld,
                                         m_low/IscDNI_ast, m_high/IscDNI_ast))
 print("thld_temp = ", thld, '\n'
        'm_low_temp = ',  m_low/IscDNI_ast, '\n'
