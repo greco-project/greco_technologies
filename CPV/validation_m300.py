@@ -9,9 +9,10 @@ from pvlib_CPVsystem import StaticCPVSystem
 from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
 import datetime
+import numpy.polynomial.polynomial as poly
 
-df= pd.read_csv('/home/local/RL-INSTITUT/inia.steinbach/Dokumente/CPV/data/m300_data_filtered.txt', header=None)
-columnnames= pd.read_csv('/home/local/RL-INSTITUT/inia.steinbach/rl-institut/04_Projekte/220_GRECO/04-Berichte/03-Projektinhalte/AP4_High_Penetration_of_Photovoltaics/T4_3_CPV/datasheets_commercial_CPV/m300_measurements_headers.csv', sep=',', dtype={'Daytime':str})
+df= pd.read_csv('/home/local/RL-INSTITUT/inia.steinbach/rl-institut/04_Projekte/220_GRECO/03-Projektinhalte/AP4_High_Penetration_of_Photovoltaics/T4_3_CPV/M300/datasheets_commercial_CPV/m300_data_filtered.txt', header=None)
+columnnames= pd.read_csv('/home/local/RL-INSTITUT/inia.steinbach/rl-institut/04_Projekte/220_GRECO/03-Projektinhalte/AP4_High_Penetration_of_Photovoltaics/T4_3_CPV/M300/datasheets_commercial_CPV/m300_measurements_headers.csv', sep=',', dtype={'Daytime':str})
 n=columnnames.columns.tolist()
 df.columns = n
 
@@ -56,7 +57,7 @@ csys.dc = csys.singlediode(photocurrent, saturation_current,
                            resistance_series,
                            resistance_shunt, nNsVth)
 
-real_power = df['Isc']*100
+real_power = df['Pmpp']
 estimation = csys.dc['p_mp']
 
 
@@ -105,23 +106,40 @@ for weight_am in np.arange(0, 1, 0.05):
 modeled_power = estimation * (np.multiply(weight_am_final, uf_am) +
                                   np.multiply(weight_temp_final, uf_temp))
 
-residualUF = real_power - modeled_power
-residualwithoutUF= real_power - estimation
+residualUF = ((real_power - modeled_power) / real_power)*100
+residualwithoutUF= ((real_power - estimation) /real_power) *100
 
- plt.plot(real_power, 'r', label='real_power')
-plt.plot(estimation, 'g', label='estimation')
-#plt.plot(modeled_power, 'b', label='modeled_power')
+plt.plot(real_power, 'r', label='real_power')
+#plt.plot(estimation, 'g', label='estimation')
+plt.plot(modeled_power, 'b', label='modeled_power')
+plt.xlabel("Time in Days")
+plt.ylabel("Power in W")
+plt.legend()
 plt.show()
+
+p1=poly.polyfit(real_power,modeled_power,1)
+
 plt.plot(real_power,modeled_power, 'bo', markersize=1, label='modeled_power with UF over measured power')
 plt.plot(real_power, estimation,'ro', markersize=1, label='modeled_power_without UF over measured power')
-plt.plot(real_power, real_power, 'g')
+plt.plot(real_power, poly.polyval(real_power, p1), 'y-', label='model_power_fit')
+plt.plot(real_power, real_power, 'g', label='real power')
+plt.xlabel("Power in W")
+plt.ylabel("Power in W")
 plt.legend()
 plt.show()
+
+
 plt.plot(airmass['airmass_relative'], residualwithoutUF, 'go', markersize=1, label='Airmass residual without UF')
 plt.plot(airmass['airmass_relative'].fillna(0), residualUF, 'ro', markersize=1, label='Airmass residual with UF')
+plt.xlabel("Airmass")
+plt.ylabel("Residual Pmpp in %")
 plt.legend()
 plt.show()
+
+
 plt.plot(df['AirTemperature'], residualUF, 'ro', markersize=1, label='Temperature residual with UF')
 plt.plot(df['AirTemperature'], residualwithoutUF, 'go', markersize=1, label='Temperature residual without UF')
+plt.xlabel("Air Temperature in T")
+plt.ylabel("Residual Pmpp in %")
 plt.legend()
 plt.show()
