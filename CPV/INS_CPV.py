@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 
 
 
-def create_CPV_timeseries(lat, lon, weather, surface_azimuth, surface_tilt):
+def create_cpv_timeseries(lat, lon, weather, surface_azimuth, surface_tilt):
 
     panel_location = pvlib.location.Location(latitude=lat, longitude=lon)
 
