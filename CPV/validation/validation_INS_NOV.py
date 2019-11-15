@@ -1,16 +1,19 @@
 import pandas as pd
 import pvlib.atmosphere
-from pvlib_CPVsystem import StaticCPVSystem
-from pvlib_CPVsystem import CPVSystem
 import matplotlib.pyplot as plt
-import pvlib_CPVsystem as cpv
 import numpy as np
 import math
 from sklearn.metrics import mean_squared_error
 import numpy.polynomial.polynomial as poly
 
+import sys
+sys.path.append('/home/local/RL-INSTITUT/inia.steinbach/Dokumente/greco_technologies_to_pvlib/CPV/')
+from pvlib_CPVsystem import CPVSystem
+import pvlib_CPVsystem as cpv
 
-df= pd.read_csv('/home/local/RL-INSTITUT/inia.steinbach/rl-institut/04_Projekte/220_GRECO/03-Projektinhalte/AP4_High_Penetration_of_Photovoltaics/T4_3_CPV/INS/INS_Nov_twoaxistracking/filtered_dataset_November_Marcos.csv', sep=',', index_col=0)
+
+
+df= pd.read_csv('/home/local/RL-INSTITUT/inia.steinbach/rl-institut/04_Projekte/220_GRECO/03-Projektinhalte/AP4_High_Penetration_of_Photovoltaics/T4_3_CPV/INS/INS_Nov_twoaxistracking/INS_november_prepared_dataset.csv', sep=',', index_col=0)
 # Converting the index as date
 
 location= pvlib.location.Location(latitude=40.453,longitude=-3.727,
@@ -29,9 +32,6 @@ csys = CPVSystem(module=None, module_parameters=module_params,
                      inverter=None, inverter_parameters=None,
                      racking_model='freestanding',
                      losses_parameters=None, name=None)
-
-spa=pvlib.solarposition.spa_python(time=df.index, latitude=40.453,
-                                   longitude=-3.72)
 
 
 celltemp = csys.pvsyst_celltemp(df['GNI'],                                      #todo: get wind speed
@@ -59,24 +59,30 @@ relative_airmass= airmass['airmass_relative'].fillna(0)
 
 # calculate single utilization factors
 
-thld_am =  4.125860936553121
-m_low_am =  0.0634016984325695
-m_high_am =  -0.21442236571732923
+IscDNI_top = 0.96/1000
+
+thld_am = 4.574231933073185
+m_low_am = 3.906372068620377e-06
+m_high_am = -3.0335768119184845e-05
+thld_temp = 50
+m_low_temp = 4.6781224141650075e-06
+m_high_temp = 0
+
+
+
 
 uf_am = []
 for i, v in relative_airmass.items():
     uf_am.append(cpv.get_single_util_factor(v, thld_am,
-                                            m_low_am, m_high_am))
+                                            m_low_am/IscDNI_top,
+                                            m_high_am/IscDNI_top))
 
-
-thld_temp =  50
-m_low_temp =  0.019546056846064516
-m_high_temp =  0.0
 
 uf_temp = []
 for i, v in df['temp'].items():
     uf_temp.append(cpv.get_single_util_factor(v, thld_temp,
-                                            m_low_temp, m_high_temp))
+                                            m_low_temp/IscDNI_top,
+                                              m_high_temp/IscDNI_top))
 
 
 weight_am_final = 1.0
@@ -103,6 +109,22 @@ modeled_power = estimation * (np.multiply(weight_am_final, uf_am) +
 
 residualUF = modeled_power - real_power
 residualwithoutUF= estimation - real_power
+
+
+plt.plot(df['temp'], uf_temp, 'b.', label='UF(temp)')
+plt.xlabel("Temperature in C")
+plt.ylabel("Utilization Factor")
+plt.legend()
+plt.show()
+
+plt.plot(relative_airmass, uf_am, 'r.', label='UF(AM)')
+plt.xlabel("Airmass")
+plt.ylabel("Utilization Factor")
+plt.legend()
+plt.show()
+
+
+
 
 plt.plot(real_power, 'r--', label='real_power')
 plt.plot(modeled_power, 'b', label='modeled_power')
