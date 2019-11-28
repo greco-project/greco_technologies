@@ -1,7 +1,0 @@
-README.md
-setup.py
-greco_technologies.egg-info/PKG-INFO
-greco_technologies.egg-info/SOURCES.txt
-greco_technologies.egg-info/dependency_links.txt
-greco_technologies.egg-info/requires.txt
-greco_technologies.egg-info/top_level.txt
