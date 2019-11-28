@@ -1,0 +1,9 @@
+pvlib>=0.6.3
+pandas>=0.24.1
+numpy
+matplotlib
+
+[dev]
+sphinx
+sphinx_rtd_theme
+requests
