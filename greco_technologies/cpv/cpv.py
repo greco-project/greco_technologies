@@ -3,7 +3,7 @@ import os
 import numpy as np
 import pvlib
 
-import cpvsystem as cpv
+import cpvtopvlib.cpvsystem as cpv
 
 
 
@@ -64,12 +64,12 @@ def create_cpv_timeseries(lat, lon, weather, surface_azimuth, surface_tilt,
 
     uf_am = []
     for i, v in relative_airmass.items():
-        uf_am.append(cpv.get_single_util_factor(v, thld_am,
+        uf_am.append(cpv.get_simple_util_factor(v, thld_am,
                                                 m_low_am / IscDNI_top,
                                                 m_high_am / IscDNI_top))
     uf_temp = []
     for i, v in weather['temp_air'].items():
-        uf_temp.append(cpv.get_single_util_factor(v, thld_temp,
+        uf_temp.append(cpv.get_simple_util_factor(v, thld_temp,
                                                   m_low_temp / IscDNI_top,
                                                   m_high_temp / IscDNI_top))
 
@@ -79,10 +79,10 @@ def create_cpv_timeseries(lat, lon, weather, surface_azimuth, surface_tilt,
         uf_aoi = []
         for i, v in weather['aoi'].items():
             uf_aoi.append(
-                cpv.get_single_util_factor(v, thld_aoi, m_low_aoi / IscDNI_top,
+                cpv.get_simple_util_factor(v, thld_aoi, m_low_aoi / IscDNI_top,
                                        m_high_aoi / IscDNI_top))
 
-        uf_aoi_top = cpv.get_single_util_factor(0, thld_aoi,
+        uf_aoi_top = cpv.get_simple_util_factor(0, thld_aoi,
                                             m_low_aoi / IscDNI_top,
                                             m_high_aoi / IscDNI_top)
 
@@ -91,6 +91,9 @@ def create_cpv_timeseries(lat, lon, weather, surface_azimuth, surface_tilt,
     else:
         uf_global=uf_am_temp
 
+    #convert array to pd.DataFrame
+    uf_global=pd.DataFrame(uf_global)
+    uf_global=uf_global.set_index(weather.index)
     return estimation * uf_global
 
 if __name__ == '__main__':
