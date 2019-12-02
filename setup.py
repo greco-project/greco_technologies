@@ -10,6 +10,7 @@ def read(fname):
 
 setup(
     name='greco_technologies',
+    version='0.0.1',
     author='Inia Steinbach',
     author_email='inia.steinbach@rl-institut.de',
     description='This repository contains modules for modeling the greco '
