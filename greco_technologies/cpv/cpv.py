@@ -91,9 +91,6 @@ def create_cpv_timeseries(lat, lon, weather, surface_azimuth, surface_tilt,
     else:
         uf_global=uf_am_temp
 
-    #convert array to pd.DataFrame
-    uf_global=pd.DataFrame(uf_global)
-    uf_global=uf_global.set_index(weather.index)
     return estimation * uf_global
 
 if __name__ == '__main__':
