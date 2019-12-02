@@ -1,0 +1,23 @@
+Metadata-Version: 2.1
+Name: greco-technologies
+Version: 0.0.1
+Summary: This repository contains modules for modeling the greco PV technologies.
+Home-page: UNKNOWN
+Author: Inia Steinbach
+Author-email: inia.steinbach@rl-institut.de
+License: UNKNOWN
+Description: # greco_technologies
+        
+        # Installation
+        
+        The CPV module requires the develloper installation of cpv_to_pvlib. First
+         you need to clone the repository
+        
+        
+            git clone git@github.com:greco-project/cpv_to_pvlib.git
+        
+        go to the local cloned repository and install the develloper version:
+        
+            pip install -e ./
+Platform: UNKNOWN
+Provides-Extra: dev
