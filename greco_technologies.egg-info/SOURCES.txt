@@ -1,7 +1,6 @@
 README.md
 setup.py
 greco_technologies/__init__.py
-greco_technologies/cpv.py
 greco_technologies.egg-info/PKG-INFO
 greco_technologies.egg-info/SOURCES.txt
 greco_technologies.egg-info/dependency_links.txt
@@ -10,6 +9,7 @@ greco_technologies.egg-info/top_level.txt
 greco_technologies/cpv/__init__.py
 greco_technologies/cpv/cpv.py
 greco_technologies/cpv/hybrid.py
+greco_technologies/cpv/inputs.py
 greco_technologies/cpv/m300_module.py
 greco_technologies/cpv/pvlib_diffuse_irradiance_fuctions.py
 greco_technologies/cpv/si.py
