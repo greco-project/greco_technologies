@@ -8,7 +8,7 @@ from pvlib.pvsystem import PVSystem
 import pvlib.pvsystem as pvsystem
 import os
 
-import cpvsystem as cpv
+import cpvtopvlib.cpvsystem as cpv
 import matplotlib.pyplot as plt
 
 
@@ -92,15 +92,15 @@ def prepare_weather(weather_loc, lat, lon, surface_tilt, surface_azimuth):
                                    solar_zenith=row['zenith'],
                                    solar_azimuth=row['azimuth'])
         # calculate optical losses
-        gt=cpv.glass_transmission_losses(aoi)
+#        gt=cpv.glass_transmission_losses(aoi)
 
         aoi_list[index] = aoi
-        gt_list[index] = gt
+ #       gt_list[index] = gt
 
-    alignement_transmission = 0.95
-    weather_loc['dni']= weather_loc['dni']*gt*alignement_transmission
-    weather_loc['perez_diffuse'] = weather_loc['perez_diffuse'] * \
-                                   gt*alignement_transmission
+  #  alignement_transmission = 0.95
+  #  weather_loc['dni']= weather_loc['dni']*gt*alignement_transmission
+#    weather_loc['perez_diffuse'] = weather_loc['perez_diffuse'] * \
+#                                   gt*alignement_transmission
 
     smallaoi = aoi_list[aoi_list < 60]
     bigaoi = aoi_list[aoi_list > 60]
@@ -124,12 +124,6 @@ def prepare_weather(weather_loc, lat, lon, surface_tilt, surface_azimuth):
         [poa_components['poa_global'], poa_components['poa_direct'],
          poa_components['poa_diffuse'], aoi_list, absulute_airmass], axis=1)
 
-    plt.plot(aoi_list, dni, 'b.', label='DNI')
-    plt.plot(aoi_list, weather_loc['perez_diffuse'], 'g.', label='DHI')
-    plt.xlabel('AOI')
-    plt.ylabel('Irradiance')
-    plt.legend()
-    plt.show()
     return prepared_dict
 
 def create_si_timeseries(lat, lon, weather, surface_azimuth, surface_tilt):
@@ -165,13 +159,18 @@ def create_si_timeseries(lat, lon, weather, surface_azimuth, surface_tilt):
         module=module_ref)
 
     weather['effective_irrandiance'] = effective_irradiance
-    temp_cell = pvsystem.sapm_celltemp(poa_global=prepared_poas['poa_global'],
+
+    from pvlib.temperature import sapm_cell, TEMPERATURE_MODEL_PARAMETERS
+
+    temp_params = TEMPERATURE_MODEL_PARAMETERS['sapm']['open_rack_glass_glass']
+
+    temp_cell = pvsystem.temperature.sapm_cell(poa_global=prepared_poas['poa_global'],
                                        wind_speed=weather['wind_speed'],
                                        temp_air=weather['temp_air'],
-                                       model='open_rack_cell_glassback')  # todo: adjust model
+                                               **temp_params)  # todo: adjust model
     temp_cell = temp_cell.fillna(0)
     output = pvsystem.sapm(effective_irradiance=effective_irradiance,
-                           temp_cell=temp_cell['temp_cell'],
+                           temp_cell=temp_cell,
                            module=module_ref)
 
     return output.p_mp
@@ -195,6 +194,8 @@ if __name__ == '__main__':
             (weather_df['lat'] == lat)  # kann das weg?
             & (weather_df['lon'] == lon)]
 
-        create_si_timeseries(lat=52.11113, lon=12.48062, weather=weather_loc,
+        ds=create_si_timeseries(lat=52.11113, lon=12.48062, weather=weather_loc,
                              surface_azimuth=180, surface_tilt=30)
+        plt.plot(ds)
+        plt.show()
         break
