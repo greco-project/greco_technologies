@@ -7,7 +7,7 @@ import pvlib.pvsystem as pvsystem
 
 import sys
 sys.path.append('/home/local/RL-INSTITUT/inia.steinbach/Dokumente/greco_technologies_to_pvlib/CPV/')
-import INS_Si
+import greco_technologies.cpv.si as si
 
 
 df= pd.read_csv('/home/local/RL-INSTITUT/inia.steinbach/rl-institut/04_Projekte/220_GRECO/03-Projektinhalte/AP4_High_Penetration_of_Photovoltaics/T4_3_CPV/INS/MAY/InsolightMay2019_filtered.csv', sep=',', index_col=0)
@@ -29,7 +29,7 @@ system_ref = PVSystem(surface_tilt=30, surface_azimuth=180,
                   inverter_parameters=None)
 
 # prepare dictionary with poa_global, poa_direct_poa_diffuse, absolute_airmass, aoi
-prepared_poas= INS_Si.INS_Si_prepare_weather(df, lat=45.641603, lon=-3.727, surface_tilt=30, surface_azimuth=180)
+prepared_poas= si.prepare_weather(df, lat=45.641603, lon=-3.727, surface_tilt=30, surface_azimuth=180)
 
 
 #todo: adapt function for effective irradiance to increase diffuse fraction
@@ -43,13 +43,17 @@ effective_irradiance = pvsystem.sapm_effective_irradiance(poa_direct=prepared_po
                                                     module=module_ref)
 
 df['effective_irrandiance']=effective_irradiance
-temp_cell= pvsystem.sapm_celltemp(poa_global=prepared_poas['poa_global'],
-                                  wind_speed=df['wind_speed'],
-                                  temp_air=df['temp_air'],
-                                  model='open_rack_cell_glassback')             # todo: adjust model
+from pvlib.temperature import sapm_cell, TEMPERATURE_MODEL_PARAMETERS
+
+temp_params = TEMPERATURE_MODEL_PARAMETERS['sapm']['open_rack_glass_glass']
+
+temp_cell = pvsystem.temperature.sapm_cell(poa_global=prepared_poas['poa_global'],
+                                       wind_speed=df['wind_speed'],
+                                       temp_air=df['temp_air'],
+                                               **temp_params)                   # todo: adjust model
 temp_cell=temp_cell.fillna(0)
 output= pvsystem.sapm(effective_irradiance=effective_irradiance,
-                 temp_cell=temp_cell['temp_cell'],
+                 temp_cell=temp_cell,
                  module=module_ref)
 
 modeled_power=output.p_mp
