@@ -13,6 +13,24 @@ import matplotlib.pyplot as plt
 def create_cpv_timeseries(
     lat, lon, weather, surface_azimuth, surface_tilt, type
 ):
+    """
+
+    creates a timeseries for a type of cpv module
+
+    :param lat: num
+        latitude
+    :param lon: num
+        longitude
+    :param weather: pd.DataFrame()
+        weather dataframe according to pvlib standards
+    :param surface_azimuth: int
+        surface azimuth
+    :param surface_tilt: int
+        surface tilt
+    :param type: str
+        possible types integrated up to this point: "ins", "m300"
+    :return: pd.DataFrame()
+    """
 
     if type == "ins":
         module_params = inputs.create_ins_cpv_dict()
