@@ -6,14 +6,11 @@ import math
 from sklearn.metrics import mean_squared_error
 import numpy.polynomial.polynomial as poly
 
-import sys
-sys.path.append('/home/local/RL-INSTITUT/inia.steinbach/Dokumente/greco_technologies_to_pvlib/CPV/')
-from pvlib_CPVsystem import CPVSystem
-import pvlib_CPVsystem as cpv
+from cpvtopvlib import cpvsystem as cpv
 
 
 
-df= pd.read_csv('/home/local/RL-INSTITUT/inia.steinbach/rl-institut/04_Projekte/220_GRECO/03-Projektinhalte/AP4_High_Penetration_of_Photovoltaics/T4_3_CPV/INS/INS_Nov_twoaxistracking/INS_november_prepared_dataset.csv', sep=',', index_col=0)
+df= pd.read_csv('../inputs/INS_november_prepared_dataset.csv', sep=',', index_col=0)
 # Converting the index as date
 
 location= pvlib.location.Location(latitude=40.453,longitude=-3.727,
@@ -27,7 +24,7 @@ module_params = {'gamma_ref' : 5.524, 'mu_gamma' : 0.003, 'I_L_ref' : 0.96,
                  'temp_ref' : 25, 'cells_in_series' : 12, 'eta_m' : 0.32,
                  'alpha_absorption' : 0.9}
 
-csys = CPVSystem(module=None, module_parameters=module_params,
+csys = cpv.CPVSystem(module=None, module_parameters=module_params,
                      modules_per_string=1, strings_per_inverter=1,
                      inverter=None, inverter_parameters=None,
                      racking_model='freestanding',
@@ -73,14 +70,14 @@ m_high_temp = 0
 
 uf_am = []
 for i, v in relative_airmass.items():
-    uf_am.append(cpv.get_single_util_factor(v, thld_am,
+    uf_am.append(cpv.get_simple_util_factor(v, thld_am,
                                             m_low_am/IscDNI_top,
                                             m_high_am/IscDNI_top))
 
 
 uf_temp = []
 for i, v in df['temp'].items():
-    uf_temp.append(cpv.get_single_util_factor(v, thld_temp,
+    uf_temp.append(cpv.get_simple_util_factor(v, thld_temp,
                                             m_low_temp/IscDNI_top,
                                               m_high_temp/IscDNI_top))
 
@@ -109,22 +106,6 @@ modeled_power = estimation * (np.multiply(weight_am_final, uf_am) +
 
 residualUF = modeled_power - real_power
 residualwithoutUF= estimation - real_power
-
-
-plt.plot(df['temp'], uf_temp, 'b.', label='UF(temp)')
-plt.xlabel("Temperature in C")
-plt.ylabel("Utilization Factor")
-plt.legend()
-plt.show()
-
-plt.plot(relative_airmass, uf_am, 'r.', label='UF(AM)')
-plt.xlabel("Airmass")
-plt.ylabel("Utilization Factor")
-plt.legend()
-plt.show()
-
-
-
 
 plt.plot(real_power, 'r--', label='real_power')
 plt.plot(modeled_power, 'b', label='modeled_power')

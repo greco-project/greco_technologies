@@ -12,8 +12,8 @@ from cpvtopvlib import cpvsystem as cpv
 
 
 
-df= pd.read_csv('/home/local/RL-INSTITUT/inia.steinbach/rl-institut/04_Projekte/220_GRECO/03-Projektinhalte/AP4_High_Penetration_of_Photovoltaics/T4_3_CPV/INS/MAY/InsolightMay2019_filtered.csv', sep=',', index_col=0)
-# Converting the index as date
+df= pd.read_csv('../inputs/InsolightMay2019_filtered.csv', sep=',', index_col=0)
+
 
 panel_location= pvlib.location.Location(latitude=40.453,longitude=-3.727,
                                          tz=1, altitude=658)
@@ -45,6 +45,7 @@ relative_airmass= airmass['airmass_relative'].fillna(0)
 aoi_list = pd.Series(name='aoi')
 ot_list = pd.Series(name='ot')
 gt_list = pd.Series(name='gt')
+
 for index, row in spa.iterrows(): #todo: correct surface_tilt and surface_azimuth
     aoi = pvlib.irradiance.aoi(surface_tilt=30,
                                surface_azimuth=180,
@@ -82,21 +83,6 @@ estimation = csys.dc['p_mp']
 
 
 # calculate single utilization factors
-
-# thld_am =  4.125860936553121
-# m_low_am =  0.0634016984325695
-# m_high_am =  -0.21442236571732923
-#
-# thld_temp =  50
-# m_low_temp =  0.019546056846064516
-# m_high_temp =  0.0
-#
-# thld_aoi =  62.74476733755362
-# m_low_aoi =  -0.0004954994407100744
-# m_high_aoi =  -0.02069421162410764
-#
-# weight_am=0.85
-# weight_temp=0.15
 
 IscDNI_top = 0.96/1000
 

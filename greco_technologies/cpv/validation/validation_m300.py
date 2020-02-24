@@ -7,19 +7,17 @@ import matplotlib.pyplot as plt
 import datetime
 import numpy.polynomial.polynomial as poly
 
-import sys
-sys.path.append('/home/local/RL-INSTITUT/inia.steinbach/Dokumente/greco_technologies_to_pvlib/CPV/')
-import pvlib_CPVsystem as cpv
+from cpvtopvlib import cpvsystem as cpv
 
 
 
-df= pd.read_csv('/home/local/RL-INSTITUT/inia.steinbach/rl-institut/04_Projekte/220_GRECO/03-Projektinhalte/AP4_High_Penetration_of_Photovoltaics/T4_3_CPV/M300/datasheets_commercial_CPV/m300_data_filtered.txt', header=None)
-columnnames= pd.read_csv('/home/local/RL-INSTITUT/inia.steinbach/rl-institut/04_Projekte/220_GRECO/03-Projektinhalte/AP4_High_Penetration_of_Photovoltaics/T4_3_CPV/M300/datasheets_commercial_CPV/m300_measurements_headers.csv', sep=',', dtype={'Daytime':str})
+df= pd.read_csv('../inputs/m300_data_filtered.txt', header=None)
+columnnames= pd.read_csv('../inputs/m300_measurements_headers.csv', sep=',', dtype={'Daytime':str})
 n=columnnames.columns.tolist()
 df.columns = n
 
 datetimestring = np.genfromtxt(
-        '/home/local/RL-INSTITUT/inia.steinbach/Dokumente/CPV/data/m300_datetime.txt',
+        '../inputs/m300_datetime.txt',
         dtype='str', delimiter = '\n')
 
 datetimeobject = []
@@ -75,7 +73,7 @@ m_high_am = -0.0210539236615148
 
 uf_am = []
 for i, v in relative_airmass.items():
-    uf_am.append(cpv.get_single_util_factor(v, thld_am,
+    uf_am.append(cpv.get_simple_util_factor(v, thld_am,
                                             m_low_am, m_high_am))
 
 
@@ -85,7 +83,7 @@ m_high_temp = 0.0
 
 uf_temp = []
 for i, v in df['AirTemperature'].items():
-    uf_temp.append(cpv.get_single_util_factor(v, thld_temp,
+    uf_temp.append(cpv.get_simple_util_factor(v, thld_temp,
                                             m_low_temp, m_high_temp))
 
 
