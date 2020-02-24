@@ -4,6 +4,7 @@ from pvlib.pvsystem import PVSystem
 import matplotlib.pyplot as plt
 import pvlib.atmosphere
 import pvlib.pvsystem as pvsystem
+import hybrid
 
 import sys
 sys.path.append('/home/local/RL-INSTITUT/inia.steinbach/Dokumente/greco_technologies_to_pvlib/CPV/')
@@ -29,7 +30,7 @@ system_ref = PVSystem(surface_tilt=30, surface_azimuth=180,
                   inverter_parameters=None)
 
 # prepare dictionary with poa_global, poa_direct_poa_diffuse, absolute_airmass, aoi
-prepared_poas= si.prepare_weather(df, lat=45.641603, lon=-3.727, surface_tilt=30, surface_azimuth=180)
+prepared_poas= hybrid.hybrid_weather_data(df, lat=45.641603, lon=-3.727, surface_tilt=30, surface_azimuth=180)
 
 
 #todo: adapt function for effective irradiance to increase diffuse fraction
