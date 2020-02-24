@@ -171,8 +171,6 @@ def hybrid_weather_data(weather_loc, lat, lon, surface_tilt, surface_azimuth):
     calculated_weather.fillna(0, inplace=True)
 
     return calculated_weather[[
-            "latitude",
-            "longitude",
             "wind_speed",
             "temp_air",
             "ghi",
