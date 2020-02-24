@@ -3,6 +3,12 @@ import pandas as pd
 
 def create_ins_cpv_dict():
 
+    """
+    returns the dict of module parameters and utilization factor for the
+    insolight cpv module
+    :return: dict
+    """
+
     module_params = {
         "gamma_ref": 5.524,
         "mu_gamma": 0.003,
@@ -45,6 +51,13 @@ def create_ins_cpv_dict():
     return module_params
 
 def create_m300_cpv_dict():
+
+    """
+    returns the dict of module parameters and utilization factor for the
+    m300 cpv module
+
+    :return: dict
+    """
 
     module_params = {'gamma_ref': 4.456, 'mu_gamma': 0.0012, 'I_L_ref': 3.346,
                      'I_o_ref': 0.000000000004, 'R_sh_ref': 4400,
