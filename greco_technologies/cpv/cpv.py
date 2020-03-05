@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 
 def create_cpv_timeseries(
-    lat, lon, weather, surface_azimuth, surface_tilt, type
+    lat, lon, weather, surface_azimuth, surface_tilt, cpvtype
 ):
     """
 
@@ -27,16 +27,16 @@ def create_cpv_timeseries(
         surface azimuth
     :param surface_tilt: int
         surface tilt
-    :param type: str
-        possible types integrated up to this point: "ins", "m300"
+    :param cpvtype: str
+        possible cpvtypes integrated up to this point: "ins", "m300"
     :return: pd.DataFrame()
     """
 
-    if type == "ins":
-        module_params = inputs.create_ins_cpv_dict()
+    if cpvtype == "ins":
+        module_params = inputs.create_cpv_dict(cpvtype='ins')
         calc_uf_aoi = True
-    elif type == "m300":
-        module_params = inputs.create_m300_cpv_dict()
+    elif cpvtype == "m300":
+        module_params = inputs.create_cpv_dict(cpvtype='m300')
         calc_uf_aoi = False
     else:
         logging.error("The type is not known.")
@@ -188,7 +188,7 @@ if __name__ == "__main__":
         weather=weather_df,
         surface_azimuth=180,
         surface_tilt=30,
-        type="m300",
+        cpvtype="m300",
     )
     plt.plot(ds)
     plt.show()
