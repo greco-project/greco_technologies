@@ -10,12 +10,12 @@ import greco_technologies.cpv.inputs as inputs
 import matplotlib.pyplot as plt
 
 
-def create_cpv_timeseries(
-    lat, lon, weather, surface_azimuth, surface_tilt, cpvtype
+def create_cpv_time_series(
+    lat, lon, weather, surface_azimuth, surface_tilt, cpv_type
 ):
     """
 
-    creates a timeseries for a type of cpv module
+    creates a time series for a type of cpv module
 
     :param lat: num
         latitude
@@ -27,16 +27,16 @@ def create_cpv_timeseries(
         surface azimuth
     :param surface_tilt: int
         surface tilt
-    :param cpvtype: str
-        possible cpvtypes integrated up to this point: "ins", "m300"
+    :param cpv_type: str
+        possible cpv_types integrated up to this point: "ins", "m300"
     :return: pd.DataFrame()
     """
 
-    if cpvtype == "ins":
-        module_params = inputs.create_cpv_dict(cpvtype='ins')
+    if cpv_type == "ins":
+        module_params = inputs.create_cpv_dict(cpv_type='ins')
         calc_uf_aoi = True
-    elif cpvtype == "m300":
-        module_params = inputs.create_cpv_dict(cpvtype='m300')
+    elif cpv_type == "m300":
+        module_params = inputs.create_cpv_dict(cpv_type='m300')
         calc_uf_aoi = False
     else:
         logging.error("The type is not known.")
@@ -167,28 +167,26 @@ def create_cpv_timeseries(
         uf_global = np.multiply(uf_am_temp, uf_aoi_norm)
     else:
         uf_global = uf_am_temp
-
-    return estimation * uf_global
+    a = estimation * uf_global
+    return a
 
 
 if __name__ == "__main__":
     #load example weather_data
-    filename = os.path.abspath(
-        "/home/local/RL-INSTITUT/inia.steinbach/Dokumente/greco-project/pvcompare/pvcompare/data/inputs/weatherdata.csv"
-    )
+    filename = "../../../pvcompare/pvcompare/data/inputs/weatherdata.csv"
     weather_df = pd.read_csv(
         filename, index_col=0, date_parser=lambda idx: pd.to_datetime(idx, utc=True)
     )
     weather_df.index = pd.to_datetime(weather_df.index).tz_convert("Europe/Berlin")
     weather_df["dni"] = weather_df["ghi"] - weather_df["dhi"]
 
-    ds = create_cpv_timeseries(
+    ds = create_cpv_time_series(
         lat=40.3,
         lon=5.4,
         weather=weather_df,
         surface_azimuth=180,
         surface_tilt=30,
-        cpvtype="m300",
+        cpv_type="m300",
     )
     plt.plot(ds)
     plt.show()

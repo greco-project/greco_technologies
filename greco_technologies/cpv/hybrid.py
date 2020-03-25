@@ -8,7 +8,7 @@ import pvlib
 import pvlib.pvsystem as pvsystem
 
 
-def create_hybrid_timeseries(lat, lon, weather, surface_tilt, surface_azimuth):
+def create_hybrid_time_series(lat, lon, weather, surface_tilt, surface_azimuth):
 
     """
     This function adds up the output power of the cpv and the backplane si
@@ -22,7 +22,7 @@ def create_hybrid_timeseries(lat, lon, weather, surface_tilt, surface_azimuth):
     :return:
     """
 
-    power_cpv = cpv.create_cpv_timeseries(
+    power_cpv = cpv.create_cpv_time_series(
         lat=lat,
         lon=lon,
         weather=weather,
@@ -30,7 +30,7 @@ def create_hybrid_timeseries(lat, lon, weather, surface_tilt, surface_azimuth):
         surface_tilt=surface_tilt,
         type="ins",
     )
-    power_si = create_si_timeseries(
+    power_si = create_si_time_series(
         lat=lat,
         lon=lon,
         weather=weather,
@@ -180,7 +180,7 @@ def hybrid_weather_data(weather_loc, lat, lon, surface_tilt, surface_azimuth):
             "airmass"]]
 
 
-def create_si_timeseries(lat, lon, weather, surface_azimuth, surface_tilt):
+def create_si_time_series(lat, lon, weather, surface_azimuth, surface_tilt):
 
     sandia_modules = pvlib.pvsystem.retrieve_sam("SandiaMod")
     module_ref = sandia_modules["Canadian_Solar_CS5P_220M___2009_"]
@@ -242,7 +242,7 @@ if __name__ == "__main__":
     weather_df.index = pd.to_datetime(weather_df.index).tz_convert("Europe/Berlin")
     weather_df["dni"] = weather_df["ghi"] - weather_df["dhi"]
 
-    ds = create_si_timeseries(
+    ds = create_si_time_series(
             lat=52.11113,
             lon=12.48062,
             weather=weather_df,
@@ -251,7 +251,7 @@ if __name__ == "__main__":
         )
     plt.plot(ds)
 
-    # dh = create_hybrid_timeseries(
+    # dh = create_hybrid_time_series(
     #     lat=40.3, lon=5.4, weather=weather_df, surface_tilt=25,
     #     surface_azimuth=180)
     # plt.plot(dh, "-b", alpha=0.7)

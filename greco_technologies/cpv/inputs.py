@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def create_cpv_dict(cpvtype):
+def create_cpv_dict(cpv_type):
 
     """
     returns the dict of module parameters and utilization factor for the
@@ -10,7 +10,7 @@ def create_cpv_dict(cpvtype):
         'ins' or 'm300'
     :return: dict
     """
-    if cpvtype == 'ins':
+    if cpv_type == 'ins':
         module_params = {
             "gamma_ref": 5.524,
             "mu_gamma": 0.003,
@@ -53,7 +53,7 @@ def create_cpv_dict(cpvtype):
         module_params.update(UF_parameters)
 
 
-    elif cpvtype == 'm300':
+    elif cpv_type == 'm300':
 
         module_params = {'gamma_ref': 4.456, 'mu_gamma': 0.0012,
                          'I_L_ref': 3.346,
