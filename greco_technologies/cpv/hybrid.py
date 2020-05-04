@@ -37,8 +37,8 @@ def create_hybrid_time_series(lat, lon, weather, surface_tilt, surface_azimuth):
         surface_azimuth=surface_azimuth,
         surface_tilt=surface_tilt,
     )
-    added = power_cpv + power_si.fillna(0)
-    return added
+    hybrid_power = power_cpv + power_si.fillna(0)
+    return hybrid_power
 
 
 def hybrid_weather_data(weather_loc, lat, lon, surface_tilt, surface_azimuth):
@@ -182,16 +182,9 @@ def hybrid_weather_data(weather_loc, lat, lon, surface_tilt, surface_azimuth):
 
 def create_si_time_series(lat, lon, weather, surface_azimuth, surface_tilt):
 
-    sandia_modules = pvlib.pvsystem.retrieve_sam("SandiaMod")
-    module_ref = sandia_modules["Canadian_Solar_CS5P_220M___2009_"]
-    # change parameters to fit INS_SI output
-    module_ref["Cells_in_Series"] = 4
-    module_ref["Cells_in_Parallel"] = 1
-    module_ref["Isco"] = 1
-    module_ref["Voco"] = 4
-    module_ref["Impo"] = 6.52
-    module_ref["Vmpo"] = 5
-
+    #load example module from sandia library
+    sandia_modules = pvlib.pvsystem.retrieve_sam('SandiaMod')
+    module = sandia_modules['Canadian_Solar_CS5P_220M___2009_']
     # prepare dictionary with poa_global, poa_direct_poa_diffuse, absolute_airmass, aoi
     hybrid_weather = hybrid_weather_data(
         weather,
@@ -209,12 +202,12 @@ def create_si_time_series(lat, lon, weather, surface_azimuth, surface_tilt):
         poa_diffuse=hybrid_weather["dhi"],
         airmass_absolute=hybrid_weather["airmass"],
         aoi=hybrid_weather["aoi"],
-        module=module_ref,
+        module=module,
     )
 
-    temp_params = TEMPERATURE_MODEL_PARAMETERS['pvsyst']['freestanding']
+    temp_params = TEMPERATURE_MODEL_PARAMETERS['sapm']['open_rack_glass_glass']
 
-    temp_cell = pvsyst_cell(
+    temp_cell = pvlib.temperature.sapm_cell(
         poa_global=hybrid_weather["ghi"],
         wind_speed=hybrid_weather["wind_speed"],
         temp_air=hybrid_weather["temp_air"],
@@ -222,9 +215,9 @@ def create_si_time_series(lat, lon, weather, surface_azimuth, surface_tilt):
     ).fillna(0)
 
     output = pvsystem.sapm(
-        effective_irradiance=effective_irradiance,
+        effective_irradiance=hybrid_weather,
         temp_cell=temp_cell,
-        module=module_ref,
+        module=module,
     )
 
     return output.p_mp
@@ -234,7 +227,7 @@ if __name__ == "__main__":
 
     #load example weather data
     filename = os.path.abspath(
-        "/home/local/RL-INSTITUT/inia.steinbach/Dokumente/greco-project/pvcompare/pvcompare/data/inputs/weatherdata.csv"
+        "/home/adminlocal/Dokumente/greco_env/pvcompare/pvcompare/data/inputs/weatherdata.csv"
     )
     weather_df = pd.read_csv(
         filename, index_col=0, date_parser=lambda idx: pd.to_datetime(idx, utc=True)

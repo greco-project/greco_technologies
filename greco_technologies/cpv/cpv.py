@@ -39,7 +39,7 @@ def create_cpv_time_series(
         module_params = inputs.create_cpv_dict(cpv_type='m300')
         calc_uf_aoi = False
     else:
-        logging.error("The type is not known.")
+        logging.error("The cpv type is not known.")
 
     cpv_sys = cpv.StaticCPVSystem(
         surface_tilt=surface_tilt,

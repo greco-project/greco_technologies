@@ -55,12 +55,20 @@ def create_cpv_dict(cpv_type):
 
     elif cpv_type == 'm300':
 
-        module_params = {'gamma_ref': 4.456, 'mu_gamma': 0.0012,
+        module_params = {'gamma_ref': 4.456,
+                         'mu_gamma': 0.0012,
                          'I_L_ref': 3.346,
-                         'I_o_ref': 0.000000000004, 'R_sh_ref': 4400,
-                         'R_sh_0': 17500, 'R_sh_exp': 5.50, 'R_s': 0.736,
-                         'alpha_sc': 0.00, 'irrad_ref': 1000, 'temp_ref': 25,
-                         'cells_in_series': 42, 'v_mp': 116.63, 'i_mp': 3.082,
+                         'I_o_ref': 0.000000000004,
+                         'R_sh_ref': 4400,
+                         'R_sh_0': 17500,
+                         'R_sh_exp': 5.50,
+                         'R_s': 0.736,
+                         'alpha_sc': 0.00,
+                         'irrad_ref': 1000,
+                         'temp_ref': 25,
+                         'cells_in_series': 42,
+                         'v_mp': 116.63,
+                         'i_mp': 3.082,
                          'Area': 1.269}
 
         UF_parameters = {
