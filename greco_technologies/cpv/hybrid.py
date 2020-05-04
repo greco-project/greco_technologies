@@ -140,7 +140,7 @@ def hybrid_weather_data(weather_loc, lat, lon, surface_tilt, surface_azimuth):
 
     # add alignement losses and glass transmission losses to DNI and perez_diffuse
     alignement_transmission = 0.95
-    weather_loc["dni"] = weather_loc["dni"] * gt * alignement_transmission
+    weather_loc["dni"] = weather_loc["dni"] * gt_list * alignement_transmission
     weather_loc["perez_diffuse"] = (
         weather_loc["perez_diffuse"] * gt * alignement_transmission
     )
@@ -215,7 +215,7 @@ def create_si_time_series(lat, lon, weather, surface_azimuth, surface_tilt):
     ).fillna(0)
 
     output = pvsystem.sapm(
-        effective_irradiance=hybrid_weather,
+        effective_irradiance=effective_irradiance,
         temp_cell=temp_cell,
         module=module,
     )
