@@ -19,7 +19,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG, format=log_format)
 
 
 def create_perosi_timeseries(
-        lat, lon, surface_azimuth, surface_tilt, year, input_directory=None
+        lat, lon, surface_azimuth, surface_tilt, year, input_directory=None, cell_type="Korte"
     ):
     """
 
@@ -51,17 +51,11 @@ def create_perosi_timeseries(
     # define output data format
     iout='4 12'
 
+    if cell_type== "Korte":
+        import data.cell_parameters_korte as param
 
-    #Psi parameters from Tockhorne und Korte
-    j0_ref=3.5248/10**(15)
-    rs=7.6
-    rsh=6230
-    eg=1.636 *1.602176634 / 10**19#eV
-    n=1.5
-    kB=1.380649 / 10**23 #J/K
-    Ns= 50 #Number of cells in series
     q = 1.602176634 / 10 ** (19)  # in Coulomb = A/s
-    A = 0.78 *Ns # Area of the solar cell in cm²
+    kB = 1.380649 / 10 ** 23  # J/K
 
     #calculate spectral parameters from smarts and era5
     spectral_parameters=smarts.calculate_Jsc_from_smarts(year=year, lat=lat, lon=lon,EQE=EQE, stop=96)
@@ -70,15 +64,15 @@ def create_perosi_timeseries(
     t_cell=pvlib.temperature.pvsyst_cell(spectral_parameters["ghi"], spectral_parameters['temp'], spectral_parameters['wind_speed'])
     j0=pd.Series()
     for index, value in t_cell.items():
-        j0[index]=j0_ref * ((value / 25)**3) * math.exp(((q*eg)/(n*kB))*((1/25)-(1/value)))
+        j0[index]=param.j0_ref * ((value / 25)**3) * math.exp(((q*param.eg)/(param.n*kB))*((1/25)-(1/value)))
 
 
-    nNsVth= n * Ns * (kB * t_cell/q)
+    nNsVth= param.n * param.Ns * (kB * t_cell/q)
 
-    Isc = spectral_parameters["Jsc"] * A
+    Isc = spectral_parameters["Jsc"] * param.A
 
     singlediode=pvlib.pvsystem.singlediode(photocurrent=Isc, saturation_current=j0,
-                               resistance_series=rs, resistance_shunt=rsh, nNsVth=nNsVth,
+                               resistance_series=param.rs, resistance_shunt=param.rsh, nNsVth=nNsVth,
                                ivcurve_pnts=None, method='lambertw')
     plt.plot(singlediode['i_sc'], singlediode["v_oc"], marker='o')
     plt.show()
@@ -102,6 +96,6 @@ if __name__ == "__main__":
     output=create_perosi_timeseries(
             lat="32.", lon=-110.92, surface_azimuth=180,
             surface_tilt=30, year=2000,
-            input_directory=None
+            input_directory=None, cell_type="Korte"
     )
     print(output)
