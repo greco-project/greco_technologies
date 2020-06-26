@@ -1,11 +1,11 @@
-import era5
+
 import pandas as pd
 
 
 
 
 def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
-                TAIR, TDAY, SEASON):
+                TAIR, TDAY, SEASON, ZONE):
     r'''
 
     function output = smartsRun(IOUT,YEAR,MONTH,DAY,HOUR, LATIT, LONGIT)
@@ -458,7 +458,7 @@ def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
     # calculation...
     WPMN = WLMN
     WPMX = WLMX
-    INTVL = '.5'
+    INTVL = '1'
 
     # Card 12b: Total number of output variables:
     # IOTOT = XXX #This is determined with the input of this function
@@ -542,7 +542,7 @@ def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
     # HOUR = '7'
     # LATIT = '32.'
     # LONGIT = '-110.92'
-    ZONE = '-7'
+    #ZONE = '1'
 
     # Card 17a: IMASS = 4 Input Moth, Latitude and DSTEP
     DSTEP = ''
@@ -882,78 +882,7 @@ def _smartsAll(CMNT, ISPR, SPR, ALTIT, HEIGHT, LATIT, IATMOS, ATMOS, RH, TAIR,
 
     return data
 
-def calculate_Jsc_from_smarts(year, lat, lon,EQE, stop):
 
-    """
-
-    :param year:
-    :return:
-    """
-
-    # load atmos data from era5
-    atmos_data= era5.load_era5_weatherdata(lat, lon, year, variable="perosi")
-    delta = pd.to_timedelta(30, unit='m')
-    atmos_data.index = atmos_data.index + delta
-    atmos_data['davt'] = atmos_data["temp_air"].resample('D').mean()
-    atmos_data=atmos_data.fillna(method='ffill')
-
-
-    q = 1.602176634 / 10 ** (19)  # in Coulomb = A/s
-
-    # load weatherdata from SMARTS
-    time = pd.date_range(start=f'1/1/{year}', end=f'31/12/{year}', freq='H')
-    # calculate Jsc for every timestep
-    c = 0
-    # define output data format
-    iout = '4 12'
-    result=pd.DataFrame()
-    for timestep in time:
-        hour = timestep.hour
-        day = timestep.day
-        month = timestep.month
-
-        if month in range(3, 8):
-            season = 'SUMMER'
-        else:
-            season = 'WINTER'
-
-        temp = atmos_data.at[timestep, 'temp_air']
-        rh = atmos_data.at[timestep, "temp_air"] / 10
-        davt = atmos_data.at[timestep, 'davt']
-        wind_speed = atmos_data.at[timestep, "wind_speed"]
-
-        static_spectrum = SMARTSSpectra(IOUT=iout, YEAR=str(year),
-                                               MONTH=str(month),
-                                               DAY=str(day), HOUR=str(hour),
-                                               LATIT=lat,
-                                               LONGIT=str(lon), WLMN='280',
-                                               WLMX='800',
-                                               TAIR=str(temp), TDAY=str(davt),
-                                        SEASON=season)
-        c = c + 1
-        if static_spectrum.empty == True:
-            result.at[timestep, "Jsc"] = 0
-            result.at[timestep, "ghi"] = 0
-            result.at[timestep, "temp"] = temp
-            result.at[timestep, "wind_speed"] = wind_speed
-        else:
-            static_spectrum.set_index('Wvlgth', inplace=True)
-            select = static_spectrum.loc[(static_spectrum.index <= 400)][::2]
-            static_spectrum.drop(
-                static_spectrum[static_spectrum.index <= 400].index,
-                inplace=True)
-            spectrum = pd.concat([select, static_spectrum])
-
-            Jsc_lambda = (spectrum["Global_tilt_photon_irrad"] * EQE[
-                "EQE"]) * q
-            Jsc_lambda.fillna(0, inplace=True)
-            result.at[timestep, "Jsc"] = Jsc_lambda.sum()  # in A/cm²
-            result.at[timestep, "ghi"] = static_spectrum["Global_horizn_irradiance"].sum()
-            result.at[timestep, "temp"] = temp
-            result.at[timestep, "wind_speed"] = wind_speed
-        if c == 96:  # break after 4 days
-            break
-    return result
 
 if __name__ == "__main__":
     #def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT)
