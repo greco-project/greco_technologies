@@ -8,3 +8,4 @@ Ns = 1  # Number of cells in series
 A = 0.78 * Ns  # Area of the solar cell in cm²
 temp_ref = 25  # °C
 alpha = -0.17 # %/K  temperature coefficient of Jsc
+EQE_filename= "EQE_3T_peroskit_measured_corrected.csv"
