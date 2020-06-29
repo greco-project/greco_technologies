@@ -5,7 +5,7 @@ import pandas as pd
 
 
 def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
-                TAIR, TDAY, SEASON, ZONE):
+                TAIR, TDAY, SEASON, ZONE, TILT, WAZIM):
     r'''
 
     function output = smartsRun(IOUT,YEAR,MONTH,DAY,HOUR, LATIT, LONGIT)
@@ -421,8 +421,8 @@ def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
     # deg. for a surface facing West. Use -999 for a sun-tracking surface.
 
     IALBDG = IALBDX
-    TILT = LATIT
-    WAZIM = '180.'
+#    TILT = LATIT
+#    WAZIM = '180.'
 
     # Card 10d:
     # RHOG: Local broadband Lambertian foreground albedo (for tilted plane calculations), Card
