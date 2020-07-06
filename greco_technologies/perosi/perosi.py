@@ -193,8 +193,8 @@ def create_timeseries(
             color = 'tab:red'
             ax1.set_xlabel('time')
             ax1.set_ylabel('Power in mW / Temperature in °C', color=color)
-            ax1.plot(result[str(x) + "_p_mp" + "_temp"]*1000, color="g", alpha=0.5, label="power")
-            ax1.plot(t_cell, color="y", alpha=0.5, label="Temperature")
+            ax1.plot(result[str(x) + "_p_mp" + "_temp"]*1000, color="r", alpha=0.5, label="power")
+            ax1.plot(t_cell, color="g", alpha=0.5, label="Cell temperature")
             ax1.tick_params(axis='y', labelcolor=color)
 
             ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
@@ -211,14 +211,13 @@ def create_timeseries(
 
             fig, ax1 = plt.subplots()
 
-            color = 'tab:red'
             ax1.set_xlabel('time')
-            ax1.set_ylabel('Power in mW', color=color)
-            ax1.plot(result[str(x) + "_p_mp" + "_temp"] * 1000, color="g",
+            ax1.set_ylabel('Power in mW', color="b")
+            ax1.plot(result[str(x) + "_p_mp" + "_temp"] * 1000, color="purple",
                      alpha=0.5, label="power_t-corrected")
             ax1.plot((singlediode['p_mp'] * 1000), color=color, alpha=0.5,
-                     label="power")
-            ax1.plot(t_cell, color=color, alpha=0.5, label="Temperature")
+                     label="power_uncorrected")
+            #ax1.plot(t_cell, color=color, alpha=0.5, label="Temperature")
             ax1.tick_params(axis='y', labelcolor=color)
 
             ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
@@ -226,7 +225,8 @@ def create_timeseries(
             color = 'tab:blue'
             ax2.set_ylabel('Temperature in °C',
                            color=color)  # we already handled the x-label with ax1
-            ax2.plot(t_cell, color="y", alpha=0.5, label="Temperature")
+            ax2.plot(smarts_parameters["temp"], color="orange", alpha=0.5, label="Air Temperature")
+            ax2.plot(t_cell, color="red", alpha=0.5, label="Cell temperature")
             ax2.tick_params(axis='y', labelcolor=color)
             fig.legend()
 
@@ -308,6 +308,6 @@ if __name__ == "__main__":
     output = create_pero_si_timeseries(
         lat="45.", lon=5.87, surface_azimuth=180,
         surface_tilt=30, year=2015,
-        input_directory=None, number_hours=8760
+        input_directory=None, number_hours=4000
     )
     print(output)
