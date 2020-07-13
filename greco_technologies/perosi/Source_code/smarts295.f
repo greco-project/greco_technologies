@@ -201,10 +201,10 @@ c      RANGE1=1./340.85
       Iwarn7=0
       Iwarn8=0
       Iwarn9=0
-      FileIn ='smarts295.inp.txt'
-      FileOut='smarts295.out.txt'
-      FileExt='smarts295.ext.txt'
-      FileScn='smarts295.scn.txt'
+      FileIn ='/home/adminlocal/Dokumente/greco_env/greco_technologies/greco_technologies/perosi/smarts295.inp.txt'
+      FileOut='/home/adminlocal/Dokumente/greco_env/greco_technologies/greco_technologies/perosi/smarts295.out.txt'
+      FileExt='/home/adminlocal/Dokumente/greco_env/greco_technologies/greco_technologies/perosi/smarts295.ext.txt'
+      FileScn='/home/adminlocal/Dokumente/greco_env/greco_technologies/greco_technologies/perosi/smarts295.scn.txt'
 C
 C
 C      Files (some with User-defined filenames)

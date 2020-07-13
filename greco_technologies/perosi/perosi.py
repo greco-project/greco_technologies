@@ -10,9 +10,8 @@ import matplotlib.pyplot as plt
 import math
 
 import pvlib
-import pvlib_smarts as smarts
-import era5
-#import SMARTS.era5
+import greco_technologies.perosi.pvlib_smarts as smarts
+import greco_technologies.perosi.era5 as era5
 
 # Reconfiguring the logger here will also affect test running in the PyCharm IDE
 log_format = "%(asctime)s %(levelname)s %(filename)s:%(lineno)d %(message)s"
@@ -69,11 +68,15 @@ def calculate_smarts_parameters(year, lat, lon, number_hours, cell_type,
             season = 'WINTER'
 
         # load spectral data from SMARTS
+        import decimal
+        d = decimal.Decimal(str(lat))
+        decimals_lat=d.as_tuple().exponent
+        lat_spectrum=str(lat)[:decimals_lat]
         spectrum = smarts.SMARTSSpectra(
             IOUT=iout, YEAR=str(year),
             MONTH=str(timestep.month),
             DAY=str(timestep.day), HOUR=str(timestep.hour),
-            LATIT=lat,
+            LATIT=lat_spectrum,
             LONGIT=str(lon), WLMN=WLMN,
             WLMX=WLMX,
             TAIR=str(atmos_data.at[timestep, 'temp_air']),
@@ -86,9 +89,9 @@ def calculate_smarts_parameters(year, lat, lon, number_hours, cell_type,
         # load EQE data
         for x in cell_type:
             if x == "Korte_pero":
-                import data.cell_parameters_korte_pero as param
+                import greco_technologies.perosi.data.cell_parameters_korte_pero as param
             elif x == "Korte_si":
-                import data.cell_parameters_korte_si as param
+                import greco_technologies.perosi.data.cell_parameters_korte_si as param
             else:
                 logging.error("The cell type is not recognized. Please "
                               "choose either 'Korte_si' or 'Korte_pero'.")
@@ -169,9 +172,9 @@ def create_timeseries(
     result=pd.DataFrame()
     for x in cell_type:
         if x == "Korte_pero":
-            import data.cell_parameters_korte_pero as param
+            import greco_technologies.perosi.data.cell_parameters_korte_pero as param
         elif x == "Korte_si":
-            import data.cell_parameters_korte_si as param
+            import greco_technologies.perosi.data.cell_parameters_korte_si as param
 #        j0=pd.Series()
 #        for index, value in t_cell.items():
  #           j0[index]=param.j0_ref * ((value / 25)**3) * math.exp(((q*param.eg)/(param.n*kB))*((1/25)-(1/value)))
@@ -236,31 +239,6 @@ def create_timeseries(
 
     return result
 
-    plt.plot(singlediode['p_mp'], marker='o', label="power in W")
-    plt.xlabel("Time")
-    plt.ylabel("Power in W")
-    plt.legend()
-    plt.show()
-
-    fig, ax = plt.subplots()
-    im = ax.scatter(analysis["ghi"], analysis["p_mp"], c=analysis["temp"])
-    ax.set_xlabel('Irradiance in W/m²')
-    ax.set_ylabel('Power in W')
-    # Add a colorbar
-    cbar=plt.colorbar(im, ax=ax)
-    cbar.set_label('Temperatute in °C', rotation=270)
-    plt.show()
-
-    fig, ax = plt.subplots()
-    im = ax.scatter(analysis["temp"], analysis["p_mp"], c=analysis["ghi"])
-    ax.set_xlabel('Temperatute in °C')
-    ax.set_ylabel('Power in W')
-    # Add a colorbar
-    cbar=plt.colorbar(im, ax=ax)
-    cbar.set_label('Irradiance in W/m²', rotation=270)
-    plt.show()
-
-    return singlediode
 
 
 def create_pero_si_timeseries(year, lat, lon, surface_azimuth,
@@ -286,12 +264,11 @@ def create_pero_si_timeseries(year, lat, lon, surface_azimuth,
     :return:pd. series()
         time series of the output power
     """
-
     timeseries=create_timeseries(
         lat=lat, lon=lon, surface_azimuth=surface_azimuth,
         surface_tilt=surface_tilt, year=year,
-        cell_type=["Korte_pero", "Korte_si"], number_hours=8760,
-        input_directory=input_directory, plot=True
+        cell_type=["Korte_pero", "Korte_si"], number_hours=number_hours,
+        input_directory=input_directory, plot=False
     )
     output = timeseries.iloc[:,0] + timeseries.iloc[:,1]
 
@@ -305,9 +282,14 @@ def create_pero_si_timeseries(year, lat, lon, surface_azimuth,
 if __name__ == "__main__":
 
 
+    # output = create_timeseries(
+    #     lat="45.", lon=5.87, surface_azimuth=180,
+    #     surface_tilt=30, year=2015,
+    #     input_directory=None, number_hours=300, cell_type=["Korte_pero"], plot=True
+    # )
     output = create_pero_si_timeseries(
-        lat="45.", lon=5.87, surface_azimuth=180,
+        lat=45.0, lon=5.87, surface_azimuth=180,
         surface_tilt=30, year=2015,
-        input_directory=None, number_hours=4000
+        input_directory=None, number_hours=400
     )
     print(output)

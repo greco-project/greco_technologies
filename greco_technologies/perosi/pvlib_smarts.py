@@ -1,6 +1,6 @@
 
 import pandas as pd
-
+import os
 
 
 
@@ -593,23 +593,23 @@ def _smartsAll(CMNT, ISPR, SPR, ALTIT, HEIGHT, LATIT, IATMOS, ATMOS, RH, TAIR,
     import subprocess
 
     try:
-        os.remove('./smarts295.inp.txt')
+        os.remove('/home/adminlocal/Dokumente/greco_env/greco_technologies/greco_technologies/perosi/smarts295.inp.txt')
     except:
         print("")
     try:
-        os.remove('./smarts295.out.txt')
+        os.remove('/home/adminlocal/Dokumente/greco_env/greco_technologies/greco_technologies/perosi/smarts295.out.txt')
     except:
         print("")
     try:
-        os.remove('./smarts295.ext.txt')
+        os.remove('/home/adminlocal/Dokumente/greco_env/greco_technologies/greco_technologies/perosi/smarts295.ext.txt')
     except:
         print("")
     try:
-        os.remove('./smarts295.scn.txt')
+        os.remove('/home/adminlocal/Dokumente/greco_env/greco_technologies/greco_technologies/perosi/smarts295.scn.txt')
     except:
         print("")
 
-    f = open('smarts295.inp.txt', 'w')
+    f = open('/home/adminlocal/Dokumente/greco_env/greco_technologies/greco_technologies/perosi/smarts295.inp.txt', 'w')
 
     IOTOT = len(IOUT.split())
 
@@ -852,31 +852,35 @@ def _smartsAll(CMNT, ISPR, SPR, ALTIT, HEIGHT, LATIT, IATMOS, ATMOS, RH, TAIR,
 
     ## Run SMARTS 2.9.5
     # dump = os.system('smarts295bat.exe')
-    command = "yes | ./program.exe"
-    p = subprocess.Popen(command, stdin=subprocess.PIPE, shell=True)
+
+    file_directory= os.path.dirname(__file__)
+
+    command = ["yes | ./program.exe"]
+#    command = "./program.exe"
+    p = subprocess.Popen(command, stdin=subprocess.PIPE, shell=True, cwd=file_directory)
     p.wait()
 
     ## Read SMARTS 2.9.5 Output File
     try:
-        data = pd.read_csv('./smarts295.ext.txt', delim_whitespace=True)
+        data = pd.read_csv("/home/adminlocal/Dokumente/greco_env/greco_technologies/greco_technologies/perosi/smarts295.ext.txt", delim_whitespace=True)
     except:
         print("data frame in empty")
         data = pd.DataFrame()
 
     try:
-        os.remove('./smarts295.inp.txt')
+        os.remove('/home/adminlocal/Dokumente/greco_env/greco_technologies/greco_technologies/perosi/smarts295.inp.txt')
     except:
         print("")
     try:
-        os.remove('./smarts295.out.txt')
+        os.remove('/home/adminlocal/Dokumente/greco_env/greco_technologies/greco_technologies/perosi/smarts295.out.txt')
     except:
         print("")
     try:
-        os.remove('./smarts295.ext.txt')
+        os.remove('/home/adminlocal/Dokumente/greco_env/greco_technologies/greco_technologies/perosi/smarts295.ext.txt')
     except:
         print("")
     try:
-        os.remove('./smarts295.scn.txt')
+        os.remove('/home/adminlocal/Dokumente/greco_env/greco_technologies/greco_technologies/perosi/smarts295.scn.txt')
     except:
         print("")
 
