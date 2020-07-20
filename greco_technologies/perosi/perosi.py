@@ -314,7 +314,7 @@ if __name__ == "__main__":
         surface_tilt=30, year=2015,
         input_directory=None, number_hours=400, type="Korte"
     )
-plt.plot(output1,"r-", label="Chen")
-plt.plot(output2,"b-", label="Korte")
-plt.legend()
-plt.show()
+    plt.plot(output1,"r-", label="Chen")
+    plt.plot(output2,"b-", label="Korte")
+    plt.legend()
+    plt.show()
