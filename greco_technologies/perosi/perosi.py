@@ -21,7 +21,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG, format=log_format)
 def calculate_smarts_parameters(year, lat, lon, number_hours, cell_type,
                                 input_directory,
                                 surface_tilt, surface_azimuth,
-                                WLMN=280, WLMX=1200):
+                                WLMN=350, WLMX=1200):
 
     """
 
@@ -92,9 +92,14 @@ def calculate_smarts_parameters(year, lat, lon, number_hours, cell_type,
                 import greco_technologies.perosi.data.cell_parameters_korte_pero as param
             elif x == "Korte_si":
                 import greco_technologies.perosi.data.cell_parameters_korte_si as param
+            elif x == "Chen_pero":
+                import greco_technologies.perosi.data.cell_parameters_Chen_2020_4T_pero as param
+            elif x == "Chen_si":
+                import greco_technologies.perosi.data.cell_parameters_Chen_2020_4T_si as param
             else:
                 logging.error("The cell type is not recognized. Please "
-                              "choose either 'Korte_si' or 'Korte_pero'.")
+                              "choose either 'Korte_si', 'Korte_pero', 'Chen_si' "
+                              "or 'Chen_pero.")
             EQE_filename = param.EQE_filename
             EQE = pd.read_csv(os.path.join(input_directory, EQE_filename),
                               index_col=0)
@@ -175,6 +180,10 @@ def create_timeseries(
             import greco_technologies.perosi.data.cell_parameters_korte_pero as param
         elif x == "Korte_si":
             import greco_technologies.perosi.data.cell_parameters_korte_si as param
+        elif x == "Chen_pero":
+            import greco_technologies.perosi.data.cell_parameters_Chen_2020_4T_pero as param
+        elif x == "Chen_si":
+            import greco_technologies.perosi.data.cell_parameters_Chen_2020_4T_si as param
 #        j0=pd.Series()
 #        for index, value in t_cell.items():
  #           j0[index]=param.j0_ref * ((value / 25)**3) * math.exp(((q*param.eg)/(param.n*kB))*((1/25)-(1/value)))
@@ -243,7 +252,7 @@ def create_timeseries(
 
 def create_pero_si_timeseries(year, lat, lon, surface_azimuth,
         surface_tilt, number_hours,
-        input_directory=None):
+        input_directory=None, type="Chen"):
 
     """
     creates a time series for the output power of a pero-si module
@@ -264,10 +273,18 @@ def create_pero_si_timeseries(year, lat, lon, surface_azimuth,
     :return:pd. series()
         time series of the output power
     """
+    if type == "Chen":
+        cell_type=["Chen_pero", "Chen_si"]
+    if type == "Korte":
+        cell_type=["Korte_pero", "Korte_si"]
+    else:
+        logging.warning("The source_type you entered is not recognized. Please "
+                        "choose between 'Korte' and 'Chen'.")
+
     timeseries=create_timeseries(
         lat=lat, lon=lon, surface_azimuth=surface_azimuth,
         surface_tilt=surface_tilt, year=year,
-        cell_type=["Korte_pero", "Korte_si"], number_hours=number_hours,
+        cell_type=cell_type, number_hours=number_hours,
         input_directory=input_directory, plot=False
     )
     output = timeseries.iloc[:,0] + timeseries.iloc[:,1]
@@ -287,9 +304,17 @@ if __name__ == "__main__":
     #     surface_tilt=30, year=2015,
     #     input_directory=None, number_hours=300, cell_type=["Korte_pero"], plot=True
     # )
-    output = create_pero_si_timeseries(
+    output1 = create_pero_si_timeseries(
         lat=45.0, lon=5.87, surface_azimuth=180,
         surface_tilt=30, year=2015,
-        input_directory=None, number_hours=400
+        input_directory=None, number_hours=400, type="Chen"
     )
-    print(output)
+    output2 = create_pero_si_timeseries(
+        lat=45.0, lon=5.87, surface_azimuth=180,
+        surface_tilt=30, year=2015,
+        input_directory=None, number_hours=400, type="Korte"
+    )
+plt.plot(output1,"r-", label="Chen")
+plt.plot(output2,"b-", label="Korte")
+plt.legend()
+plt.show()

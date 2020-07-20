@@ -1,4 +1,4 @@
-Ns = 1  # Number of cells in series
+Ns = 2  # Number of cells in series
 A = 0.78 * Ns  # Area of the solar cell in cm²
 I_0 = (7.1142 /10**(14))*A
 Isc_ref=(39.62/1000) * A
