@@ -27,4 +27,4 @@ setup(
         'numpy',
         'matplotlib',
         'xarray==0.15.0',
-        'feedinlib'])
+        'feedinlib==0.0.12'])
