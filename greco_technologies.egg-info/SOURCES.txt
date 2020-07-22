@@ -10,10 +10,6 @@ greco_technologies/cpv/__init__.py
 greco_technologies/cpv/cpv.py
 greco_technologies/cpv/hybrid.py
 greco_technologies/cpv/inputs.py
-greco_technologies/cpv/m300_module.py
-greco_technologies/cpv/pvlib_diffuse_irradiance_fuctions.py
-greco_technologies/cpv/si.py
-greco_technologies/cpv/visualizing_data.py
 greco_technologies/cpv/preprocessing/__init__.py
 greco_technologies/cpv/preprocessing/data_preprocessing_INS_NOV.py
 greco_technologies/cpv/preprocessing/data_preprocessing_m300.py
@@ -23,10 +19,3 @@ greco_technologies/cpv/validation/validation_INS_MAY.py
 greco_technologies/cpv/validation/validation_INS_NOV.py
 greco_technologies/cpv/validation/validation_INS_SI.py
 greco_technologies/cpv/validation/validation_m300.py
-greco_technologies/perosi/CPV_main_psi.py
-greco_technologies/perosi/__init__.py
-greco_technologies/perosi/data_preprocessing_psi.py
-greco_technologies/perosi/pvlib_CPVsystem.py
-greco_technologies/perosi/regression_analysis.py
-greco_technologies/perosi/setup_module.py
-greco_technologies/perosi/validation_psi.py

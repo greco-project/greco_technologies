@@ -1,6 +1,6 @@
 #SI
-Ns = 30  # Number of cells in series
-A = 0.049 * Ns  # Area of the solar cell in cm²
+Ns = 200   # Number of cells in series
+A = 0.49 * Ns  # Area of the solar cell in cm²
 I_0 = 1/10**(13)*A
 Isc_ref=(17.2/1000) * A
 
@@ -12,5 +12,5 @@ temp_ref = 25  # °C
 alpha = -0.0037  # 1/K  temperature coefficient of Jsc
 
 
-p_mp_si = 0.000446
+p_mp = 0.000446*Ns
 EQE_filename= "CHEN_2020_EQE_curve_si_corrected.csv"

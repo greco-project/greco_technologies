@@ -26,4 +26,5 @@ setup(
         'pandas >= 0.24.1',
         'numpy',
         'matplotlib',
-        'xarray==0.15.0'])
+        'xarray==0.15.0',
+        'feedinlib'])

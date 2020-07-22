@@ -61,6 +61,8 @@ def calculate_smarts_parameters(year, lat, lon, number_hours, cell_type,
     time = pd.date_range(start=f'1/1/{year}', end=f'31/12/{year}', freq='H')
     # calculate Jsc for every timestep
     result=pd.DataFrame()
+    logging.info("loading spectral weather data from SMARTS Nrel and "
+                 "calculating Isc for every timestep")
     for timestep in time:
         if timestep.month in range(3, 8):
             season = 'SUMMER'
@@ -252,7 +254,7 @@ def create_timeseries(
 
 def create_pero_si_timeseries(year, lat, lon, surface_azimuth,
         surface_tilt, number_hours,
-        input_directory=None, type="Chen"):
+        input_directory=None, psi_type="Chen"):
 
     """
     creates a time series for the output power of a pero-si module
@@ -273,9 +275,9 @@ def create_pero_si_timeseries(year, lat, lon, surface_azimuth,
     :return:pd. series()
         time series of the output power
     """
-    if type == "Chen":
+    if psi_type == "Chen":
         cell_type=["Chen_pero", "Chen_si"]
-    if type == "Korte":
+    if psi_type == "Korte":
         cell_type=["Korte_pero", "Korte_si"]
     else:
         logging.warning("The source_type you entered is not recognized. Please "

@@ -11,3 +11,4 @@ n = 1
 temp_ref = 25  # °C
 alpha = -0.0037 # 1/K  temperature coefficient of Jsc
 EQE_filename= "EQE_3T_silicone_measured_corrected.csv"
+p_mp = 0.009 * Ns
