@@ -25,4 +25,5 @@ setup(
         'pvlib >= 0.6.3',
         'pandas >= 0.24.1',
         'numpy',
-        'matplotlib'])
+        'matplotlib',
+        'xarray==0.15.0'])
