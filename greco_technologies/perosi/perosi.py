@@ -186,66 +186,18 @@ def create_timeseries(
             import greco_technologies.perosi.data.cell_parameters_Chen_2020_4T_pero as param
         elif x == "Chen_si":
             import greco_technologies.perosi.data.cell_parameters_Chen_2020_4T_si as param
-#        j0=pd.Series()
-#        for index, value in t_cell.items():
- #           j0[index]=param.j0_ref * ((value / 25)**3) * math.exp(((q*param.eg)/(param.n*kB))*((1/25)-(1/value)))
-        #temperature effect on short circuit current
-#        smarts_parameters["Jsc_temp"]= smarts_parameters["Jsc_" + str(x)] + smarts_parameters["ghi"]/1000 *(param.alpha * (t_cell - param.temp_ref))
+
         nNsVth= param.n * param.Ns * (kB * (t_cell+273.15)/q)
 
-#       Jsc_in_m = spectral_parameters["Jsc"]*10000
         Isc = smarts_parameters["Jsc_" + str(x)]* param.A
         singlediode=pvlib.pvsystem.singlediode(photocurrent=Isc, saturation_current=param.I_0,
                                resistance_series=param.rs, resistance_shunt=param.rsh, nNsVth=nNsVth,
                                ivcurve_pnts=None, method='lambertw')
         result[str(x) + "_p_mp"] = singlediode["p_mp"]
-        result[str(x) + "_p_mp" + "_temp"]=result[str(x) + "_p_mp"] * (1 + (param.alpha * (t_cell - param.temp_ref)))
-
-        if plot == True:
-            fig, ax1 = plt.subplots()
-
-            color = 'tab:red'
-            ax1.set_xlabel('time')
-            ax1.set_ylabel('Power in mW / Temperature in °C', color=color)
-            ax1.plot(result[str(x) + "_p_mp" + "_temp"]*1000, color="r", alpha=0.5, label="power")
-            ax1.plot(t_cell, color="g", alpha=0.5, label="Cell temperature")
-            ax1.tick_params(axis='y', labelcolor=color)
-
-            ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
-
-            color = 'tab:blue'
-            ax2.set_ylabel('irradiance in W/m²',
-                           color=color)  # we already handled the x-label with ax1
-            ax2.plot(smarts_parameters["ghi"], color=color, alpha=0.5, label="Irradiance")
-            ax2.tick_params(axis='y', labelcolor=color)
-            fig.legend()
-
-            fig.tight_layout()  # otherwise the right y-label is slightly clipped
-            plt.show()
-
-            fig, ax1 = plt.subplots()
-
-            ax1.set_xlabel('time')
-            ax1.set_ylabel('Power in mW', color="b")
-            ax1.plot(result[str(x) + "_p_mp" + "_temp"] * 1000, color="purple",
-                     alpha=0.5, label="power_t-corrected")
-            ax1.plot((singlediode['p_mp'] * 1000), color=color, alpha=0.5,
-                     label="power_uncorrected")
-            #ax1.plot(t_cell, color=color, alpha=0.5, label="Temperature")
-            ax1.tick_params(axis='y', labelcolor=color)
-
-            ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
-
-            color = 'tab:blue'
-            ax2.set_ylabel('Temperature in °C',
-                           color=color)  # we already handled the x-label with ax1
-            ax2.plot(smarts_parameters["temp"], color="orange", alpha=0.5, label="Air Temperature")
-            ax2.plot(t_cell, color="red", alpha=0.5, label="Cell temperature")
-            ax2.tick_params(axis='y', labelcolor=color)
-            fig.legend()
-
-            fig.tight_layout()  # otherwise the right y-label is slightly clipped
-            plt.show()
+        # add temperature correction
+        result[str(x) + "_p_mp"]=result[str(x) + "_p_mp"] * (1 + (param.alpha * (t_cell - param.temp_ref)))
+        # add CTM losses of 5%
+        result[str(x) + "_p_mp"] = result[str(x) + "_p_mp"] - (result[str(x) + "_p_mp"]/100)*5
 
 
     return result
@@ -287,7 +239,7 @@ def create_pero_si_timeseries(year, lat, lon, surface_azimuth,
         lat=lat, lon=lon, surface_azimuth=surface_azimuth,
         surface_tilt=surface_tilt, year=year,
         cell_type=cell_type, number_hours=number_hours,
-        input_directory=input_directory, plot=False
+        input_directory=input_directory, plot=True
     )
     output = timeseries.iloc[:,0] + timeseries.iloc[:,1]
 
@@ -309,12 +261,12 @@ if __name__ == "__main__":
     output1 = create_pero_si_timeseries(
         lat=45.0, lon=5.87, surface_azimuth=180,
         surface_tilt=30, year=2015,
-        input_directory=None, number_hours=400, type="Chen"
+        input_directory=None, number_hours=400, psi_type="Chen"
     )
     output2 = create_pero_si_timeseries(
         lat=45.0, lon=5.87, surface_azimuth=180,
         surface_tilt=30, year=2015,
-        input_directory=None, number_hours=400, type="Korte"
+        input_directory=None, number_hours=400, psi_type="Korte"
     )
     plt.plot(output1,"r-", label="Chen")
     plt.plot(output2,"b-", label="Korte")
