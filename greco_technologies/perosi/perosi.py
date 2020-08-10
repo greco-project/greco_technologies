@@ -168,7 +168,7 @@ def create_timeseries(
     """
     if input_directory == None:
         input_directory = os.path.join(
-    os.path.dirname(__file__), "data/"
+    os.path.dirname(__file__), "data"
 )
     q = 1.602176634 / 10 ** (19)  # in Coulomb = A/s
     kB = 1.380649 / 10 ** 23  # J/K
