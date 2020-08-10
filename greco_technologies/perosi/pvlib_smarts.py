@@ -5,7 +5,7 @@ import os
 
 
 def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
-                TAIR, TDAY, SEASON, ZONE, TILT, WAZIM):
+                TAIR, TDAY, SEASON, ZONE, TILT, WAZIM, input_directory):
     r'''
 
     function output = smartsRun(IOUT,YEAR,MONTH,DAY,HOUR, LATIT, LONGIT)
@@ -557,7 +557,7 @@ def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
                         INTVL, IOUT, ICIRC, SLOPE, APERT, LIMIT, ISCAN, IFILT,
                         WV1, WV2, STEP, FWHM, ILLUM, IUV, IMASS, ZENITH, AZIM,
                         ELEV, AMASS, YEAR, MONTH, DAY, HOUR, LONGIT, ZONE,
-                        DSTEP)
+                        DSTEP, input_directory)
 
     return output
 
@@ -570,7 +570,7 @@ def _smartsAll(CMNT, ISPR, SPR, ALTIT, HEIGHT, LATIT, IATMOS, ATMOS, RH, TAIR,
                TILT, WAZIM, RHOG, WLMN, WLMX, SUNCOR, SOLARC, IPRT, WPMN, WPMX,
                INTVL, IOUT, ICIRC, SLOPE, APERT, LIMIT, ISCAN, IFILT, WV1, WV2,
                STEP, FWHM, ILLUM, IUV, IMASS, ZENITH, AZIM, ELEV, AMASS, YEAR,
-               MONTH, DAY, HOUR, LONGIT, ZONE, DSTEP):
+               MONTH, DAY, HOUR, LONGIT, ZONE, DSTEP, input_directory):
     r'''
     #data = smartsAll(CMNT, ISPR, SPR, ALTIT, HEIGHT, LATIT, IATMOS, ATMOS, RH, TAIR, SEASON, TDAY, IH2O, W, IO3, IALT, AbO3, IGAS, ILOAD, ApCH2O, ApCH4, ApCO, ApHNO2, ApHNO3, ApNO,ApNO2, ApNO3, ApO3, ApSO2, qCO2, ISPCTR, AEROS, ALPHA1, ALPHA2, OMEGL, GG, ITURB, TAU5, BETA, BCHUEP, RANGE, VISI, TAU550, IALBDX, RHOX, ITILT, IALBDG,TILT, WAZIM,  RHOG, WLMN, WLMX, SUNCOR, SOLARC, IPRT, WPMN, WPMX, INTVL, IOUT, ICIRC, SLOPE, APERT, LIMIT, ISCAN, IFILT, WV1, WV2, STEP, FWHM, ILLUM,IUV, IMASS, ZENITH, ELEV, AMASS, YEAR, MONTH, DAY, HOUR, LONGIT, ZONE, DSTEP)
     # SMARTS Control Function
@@ -592,24 +592,27 @@ def _smartsAll(CMNT, ISPR, SPR, ALTIT, HEIGHT, LATIT, IATMOS, ATMOS, RH, TAIR,
     import pandas as pd
     import subprocess
 
+    file_directory = os.path.dirname(__file__)
+
     try:
-        os.remove('/home/adminlocal/Dokumente/greco_env/greco_technologies/greco_technologies/perosi/smarts295.inp.txt')
+        os.remove(os.path.join(file_directory, 'smarts295.inp.txt'))
     except:
         print("")
     try:
-        os.remove('/home/adminlocal/Dokumente/greco_env/greco_technologies/greco_technologies/perosi/smarts295.out.txt')
+        os.remove(os.path.join(file_directory, 'smarts295.out.txt'))
     except:
         print("")
     try:
-        os.remove('/home/adminlocal/Dokumente/greco_env/greco_technologies/greco_technologies/perosi/smarts295.ext.txt')
+        os.remove(os.path.join(file_directory, 'smarts295.ext.txt'))
     except:
         print("")
     try:
-        os.remove('/home/adminlocal/Dokumente/greco_env/greco_technologies/greco_technologies/perosi/smarts295.scn.txt')
+        os.remove(os.path.join(file_directory, 'smarts295.scn.txt'))
     except:
         print("")
 
-    f = open('/home/adminlocal/Dokumente/greco_env/greco_technologies/greco_technologies/perosi/smarts295.inp.txt', 'w')
+    file_open=os.path.join(os.path.dirname(__file__), 'smarts295.inp.txt')
+    f = open(file_open, 'w')
 
     IOTOT = len(IOUT.split())
 
@@ -853,7 +856,7 @@ def _smartsAll(CMNT, ISPR, SPR, ALTIT, HEIGHT, LATIT, IATMOS, ATMOS, RH, TAIR,
     ## Run SMARTS 2.9.5
     # dump = os.system('smarts295bat.exe')
 
-    file_directory= os.path.dirname(__file__)
+    file_directory=os.path.dirname(__file__)
 
     command = ["yes | ./program.exe"]
 #    command = "./program.exe"
@@ -861,26 +864,28 @@ def _smartsAll(CMNT, ISPR, SPR, ALTIT, HEIGHT, LATIT, IATMOS, ATMOS, RH, TAIR,
     p.wait()
 
     ## Read SMARTS 2.9.5 Output File
+    open_csv = os.path.join(file_directory, "smarts295.ext.txt")
+
     try:
-        data = pd.read_csv("/home/adminlocal/Dokumente/greco_env/greco_technologies/greco_technologies/perosi/smarts295.ext.txt", delim_whitespace=True)
+        data = pd.read_csv(open_csv, delim_whitespace=True)
     except:
-        print("data frame in empty")
+        print(f"the file directory is {open_csv}. The directory is incorrect, the dataframe is empty.")
         data = pd.DataFrame()
 
     try:
-        os.remove('/home/adminlocal/Dokumente/greco_env/greco_technologies/greco_technologies/perosi/smarts295.inp.txt')
+        os.remove(os.path.join(file_directory, 'smarts295.inp.txt'))
     except:
         print("")
     try:
-        os.remove('/home/adminlocal/Dokumente/greco_env/greco_technologies/greco_technologies/perosi/smarts295.out.txt')
+        os.remove(os.path.join(file_directory, 'smarts295.out.txt'))
     except:
         print("")
     try:
-        os.remove('/home/adminlocal/Dokumente/greco_env/greco_technologies/greco_technologies/perosi/smarts295.ext.txt')
+        os.remove(os.path.join(file_directory, 'smarts295.ext.txt'))
     except:
         print("")
     try:
-        os.remove('/home/adminlocal/Dokumente/greco_env/greco_technologies/greco_technologies/perosi/smarts295.scn.txt')
+        os.remove(os.path.join(file_directory, 'smarts295.scn.txt'))
     except:
         print("")
 

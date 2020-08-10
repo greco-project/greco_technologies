@@ -3,11 +3,7 @@ import pandas as pd
 import logging
 import sys
 import os
-import pvlib
-import scipy.integrate as integrate
-import numpy as np
 import matplotlib.pyplot as plt
-import math
 
 import pvlib
 import greco_technologies.perosi.pvlib_smarts as smarts
@@ -98,7 +94,8 @@ def calculate_smarts_parameters(year, lat, lon, number_hours, cell_type,
             SEASON=season,
             ZONE=1,
             TILT=str(surface_tilt),
-            WAZIM=str(surface_azimuth))
+            WAZIM=str(surface_azimuth),
+            input_directory=input_directory)
 
         # load EQE data
         for x in cell_type:
@@ -218,8 +215,8 @@ def create_timeseries(
 
 
 def create_pero_si_timeseries(year, lat, lon, surface_azimuth,
-        surface_tilt, number_hours, atmos_data=None,
-        input_directory=None, psi_type="Chen"):
+        surface_tilt, number_hours, input_directory, atmos_data=None,
+        psi_type="Chen"):
 
     """
     creates a time series for the output power of a pero-si module
@@ -252,7 +249,7 @@ def create_pero_si_timeseries(year, lat, lon, surface_azimuth,
         lat=lat, lon=lon, surface_azimuth=surface_azimuth,
         surface_tilt=surface_tilt, atmos_data=atmos_data, year=year,
         cell_type=cell_type, number_hours=number_hours,
-        input_directory=input_directory, plot=True
+        input_directory=None, plot=True
     )
     output = timeseries.iloc[:,0] + timeseries.iloc[:,1]
 
