@@ -112,8 +112,12 @@ def calculate_smarts_parameters(year, lat, lon, number_hours, cell_type,
                               "choose either 'Korte_si', 'Korte_pero', 'Chen_si' "
                               "or 'Chen_pero.")
             EQE_filename = param.EQE_filename
-            EQE = pd.read_csv(os.path.join(input_directory, EQE_filename),
+            EQE_path=os.path.join(input_directory, EQE_filename)
+            if os.path.isfile(EQE_path):
+                EQE = pd.read_csv(EQE_path,
                               index_col=0)
+            else:
+                logging.error(f"The file {EQE_path} cannot be found.")
             EQE = EQE / 100
 
             # return Jsc and ghi = 0 if the spectrum is empty
