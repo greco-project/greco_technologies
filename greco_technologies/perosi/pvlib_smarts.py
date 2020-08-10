@@ -1,12 +1,25 @@
-
 import pandas as pd
 import os
 
 
-
-def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
-                TAIR, TDAY, SEASON, ZONE, TILT, WAZIM, input_directory):
-    r'''
+def SMARTSSpectra(
+    IOUT,
+    YEAR,
+    MONTH,
+    DAY,
+    HOUR,
+    LATIT,
+    LONGIT,
+    WLMN,
+    WLMX,
+    TAIR,
+    TDAY,
+    SEASON,
+    ZONE,
+    TILT,
+    WAZIM,
+):
+    r"""
 
     function output = smartsRun(IOUT,YEAR,MONTH,DAY,HOUR, LATIT, LONGIT)
     Function that runs the smartsAll function to get a standard spectrum
@@ -85,19 +98,19 @@ def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
            9/14 - Creation of wrapper. J.Russo
            06/18 - Set Lat and Long as inputs. S. Ayala.
            01/20 - Ported to python S. Ayala
-    '''
+    """
 
     ## Card 1: Comment
-    CMNT = 'ASTMG173-03 (AM1.5 Standard)'
+    CMNT = "ASTMG173-03 (AM1.5 Standard)"
 
     ## Card 2: ISPR is an option for sites pressure.
     # ISPR = 0 to input SPR on Card 2a
     # ISPR = 1 to input SPR, ALTIT and HEIGHT on Card 2a
     # ISPR = 2 to input LATIT, ALTIT and HEIGHT on Card 2a.
-    ISPR = '1'
+    ISPR = "1"
 
     # Card 2a (if ISPR = 0): SPR
-    SPR = '1013.25'  # mbar
+    SPR = "1013.25"  # mbar
 
     # Card 2a (if ISPR = 1): SPR, ALTIT, HEIGHT
     # SPR: Surface pressure (mb).
@@ -118,8 +131,8 @@ def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
     # The total ALTIT + HEIGHT is the altitude of the simulated object above sea level and
     # must be ? 100 km.
 
-    ALTIT = '0.805'  # km
-    HEIGHT = '0'
+    ALTIT = "0.805"  # km
+    HEIGHT = "0"
     # LATIT = '32.' #dec degs END WITH DOT
 
     ## Card 3: IATMOS is an option to select the proper default atmosphere
@@ -129,7 +142,7 @@ def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
     # Set IATMOS = 1 to select one of 10 default reference atmospheres (i.e., for ideal conditions). The
     # shortened name of this atmosphere must be provided by ATMOS on Card 3a.
 
-    IATMOS = '1'
+    IATMOS = "1"
 
     # Card 3a (if IATMOS = 1): ATMOS
     # ATMOS is the name of the selected reference atmosphere; 4 characters max. This name can
@@ -139,7 +152,7 @@ def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
     # SAW (Sub-Arctic Winter) TRL (Tropical) STS (Sub-Tropical Summer)
     # STW (Sub-Tropical Winter) AS (Arctic Summer) AW (Arctic Winter)
 
-    ATMOS = 'USSA'
+    ATMOS = "USSA"
 
     # Card 3a(if IATMOS = 0): TAIR, RH, SEASON, TDAY.
     # RH: Relative humidity at site level (%).
@@ -152,10 +165,10 @@ def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
     # is a reference temperature for various calculations, therefore it is important to provide a
     # realistic value in this case in particular. Acceptable range: -120 < TDAY < 50.
 
-    RH = ''
-    #TAIR = ''
-    #SEASON = ''
-    #TDAY = ''
+    RH = ""
+    # TAIR = ''
+    # SEASON = ''
+    # TDAY = ''
 
     ## Card 4: IH2O is an option to select the correct water vapor data. All water vapor calculations involve
     # precipitable water, W. The following values of IH2O are possible:
@@ -168,11 +181,11 @@ def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
     # If IATMOS = 0 is selected, then IH2O should be 0 or 2; IO3 and IGAS should be 0.
     # If IATMOS = 1 is selected, then IH2O, IO3, and IGAS may take any value. All user inputs
     # have precedence over the defaults.
-    IH2O = '1'
+    IH2O = "1"
 
     # Card 4a: (if IH2O = 0): W is precipitable water above the site altitude
     # in units of cm, or equivalently, g/cm2; it must be ? 12.
-    W = ''
+    W = ""
 
     ## Card 5: IO3 is an option to select the appropriate ozone abundance input.
     # IO3 = 0 to input IALT and AbO3 on Card 5a
@@ -182,7 +195,7 @@ def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
     # If IATMOS = 1 is selected, then IH2O, IO3, and IGAS may take any value. All user inputs
     # have precedence over the defaults.
 
-    IO3 = '1'
+    IO3 = "1"
 
     # Card 5a (if IO3 = 0): IALT, AbO3
     # IALT is an option to select the appropriate ozone column altitude correction.
@@ -191,8 +204,8 @@ def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
     # profile correction needs to be applied (in case of an elevated site when
     # the value of AbO3 is known only at sea level).
 
-    IALT = ''
-    AbO3 = ''
+    IALT = ""
+    AbO3 = ""
 
     ## Card 6 IGAS is an option to define the correct conditions for gaseous absorption and atmospheric pollution.
     # IGAS = 0 if ILOAD on Card 6a is to be read so that extra gaseous absorption calculations
@@ -204,7 +217,7 @@ def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
     # If IATMOS = 1 is selected, then IH2O, IO3, and IGAS may take any value. All user inputs
     # have precedence over the defaults.
 
-    IGAS = '0'
+    IGAS = "0"
 
     # Card 6a  (if IGAS = 0): ILOAD is an option for tropospheric pollution, only used if IGAS = 0.
     # For ILOAD = 0, Card 6b will be read with the concentrations of 10 pollutants.
@@ -215,7 +228,7 @@ def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
     # represent typical urban conditions: LIGHT POLLUTION (ILOAD = 2), MODERATE
     # POLLUTION (ILOAD = 3), and SEVERE POLLUTION (ILOAD = 4).
 
-    ILOAD = '1'
+    ILOAD = "1"
 
     # Card 6b (if IGAS = 0 and ILOAD = 0): ApCH2O, ApCH4, ApCO, ApHNO2,
     # ApHNO3, ApNO, ApNO2, ApNO3, ApO3, ApSO2
@@ -240,19 +253,19 @@ def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
     # ApSO2: Sulfur dioxide volumetric concentration in the assumed 1-km deep tropospheric
     # pollution layer (ppmv).
 
-    ApCH2O = ''
-    ApCH4 = ''
-    ApCO = ''
-    ApHNO2 = ''
-    ApHNO3 = ''
-    ApNO = ''
-    ApNO2 = ''
-    ApNO3 = ''
-    ApO3 = ''
-    ApSO2 = ''
+    ApCH2O = ""
+    ApCH4 = ""
+    ApCO = ""
+    ApHNO2 = ""
+    ApHNO3 = ""
+    ApNO = ""
+    ApNO2 = ""
+    ApNO3 = ""
+    ApO3 = ""
+    ApSO2 = ""
 
     ## Card 7 qCO2 carbon dioxide columnar volumetric concentration (ppmv).
-    qCO2 = '0'
+    qCO2 = "0"
 
     # Card 7a ISPCTR
     # is an option to select the proper extraterrestrial
@@ -269,7 +282,7 @@ def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
     # 7 Spctrm_7.dat MODTRAN2 Wehrli/WRC/WMO, 1985 1367.00
     # 8 Spctrm_8.dat N/A ASTM E490, 2000 (synthetic) 1366.10
 
-    ISPCTR = '0'
+    ISPCTR = "0"
 
     ## Card 8: AEROS selects the aerosol model, with one of the following twelve possible choices:
     # S&F_RURAL, S&F_URBAN, S&F_MARIT, S&F_TROPO, These four choices
@@ -285,7 +298,7 @@ def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
     # turbid conditions (sandstorms).
     # 'USER' Card 8a is then necessary to input user-supplied aerosol information.
 
-    AEROS = 'S&F_TROPO'
+    AEROS = "S&F_TROPO"
     # Card 8a:
     # if AEROS = USER: ALPHA1, ALPHA2, OMEGL, GG These 4 variables must represent broadband average values only!
     # ALPHA1: Average value of Ångströms wavelength exponent ? for wavelengths < 500 nm
@@ -294,10 +307,10 @@ def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
     # (generally between 0.0 and 2.6).
     # OMEGL: Aerosol single scattering albedo (generally between 0.6 and 1.0).
     # GG: Aerosol asymmetry parameter (generally between 0.5 and 0.9).
-    ALPHA1 = ''
-    ALPHA2 = ''
-    OMEGL = ''
-    GG = ''
+    ALPHA1 = ""
+    ALPHA2 = ""
+    OMEGL = ""
+    GG = ""
 
     ## Card 9: ITURB is an option to select the correct turbidity data input. The different options are:
     # 0, to read TAU5 on Card 9a
@@ -307,18 +320,18 @@ def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
     # 4, to read VISI on Card 9a
     # 5, to read TAU550 on Card 9a (new option).
 
-    ITURB = '0'
+    ITURB = "0"
 
     # Card 9a Turbidity value
-    TAU5 = '0.00'  # if ITURB == 0
-    BETA = ''  # if ITURB == 1
-    BCHUEP = ''  # if ITURB == 2
-    RANGE = ''  # if ITURB == 3
-    VISI = ''  # if ITURB == 4
-    TAU550 = ''  # if ITURB == 5
+    TAU5 = "0.00"  # if ITURB == 0
+    BETA = ""  # if ITURB == 1
+    BCHUEP = ""  # if ITURB == 2
+    RANGE = ""  # if ITURB == 3
+    VISI = ""  # if ITURB == 4
+    TAU550 = ""  # if ITURB == 5
 
     ## Card 10: Far Field Albedo for backscattering
-    IALBDX = '38'
+    IALBDX = "38"
 
     # IALBX Code, Description File name(.DAT extension), Reflection, Type*, Spectral range(?m), Category*
     # -1 Fixed broadband albedo  L 0.284.0 U
@@ -402,14 +415,14 @@ def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
     # V Vegetation
     # W Water, snow, or ice
     # Card 10a:
-    RHOX = ''
+    RHOX = ""
     # Zonal broadband Lambertian ground albedo (for backscattering calculations); must
     # be between 0 and 1.
 
     # Card 10b: ITILT is an option for tilted surface calculations.
     # Select ITILT= 0 for no such calculation,
     # ITILT = 1 to initiate these calculations using information on Card 10c.
-    ITILT = '1'
+    ITILT = "1"
 
     # Card 10c:
     # IALBDG is identical to IALBDX (see Card 10) except that it relates to the foreground local
@@ -421,18 +434,18 @@ def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
     # deg. for a surface facing West. Use -999 for a sun-tracking surface.
 
     IALBDG = IALBDX
-#    TILT = LATIT
-#    WAZIM = '180.'
+    #    TILT = LATIT
+    #    WAZIM = '180.'
 
     # Card 10d:
     # RHOG: Local broadband Lambertian foreground albedo (for tilted plane calculations), Card
     # 10d (if IALBDG = -1); usually between 0.05 and 0.90.
-    RHOG = ''
+    RHOG = ""
 
     ## Card 11: Spectral range for all Calculations
-    #WLMN = '280'  # Min wavelength
-    #WLMX = '4000'  # Max wavelength
-    SUNCOR = '1.0'
+    # WLMN = '280'  # Min wavelength
+    # WLMX = '4000'  # Max wavelength
+    SUNCOR = "1.0"
     # Correction factor for irradiance is a correction factor equal to the inverse squared actual radius vector, or true Sun-Earth
     # distance; e.g., SUNCOR = 1.024.
     # SUNCOR varies naturally between 0.966 and 1.034, adding 3.4% to the irradiance in January
@@ -442,7 +455,7 @@ def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
     # the average extraterrestrial irradiance (or solar constant, see SOLARC) is to be used, or to any
     # other number between 0.966 and 1.034 to correct it for distance if so desired.
 
-    SOLARC = '1367.0'  # Solar constant
+    SOLARC = "1367.0"  # Solar constant
 
     ## Card 12: Output results selection:
     # IPRT is an option to select the results to be printed on Files 16 and 17. Only broadband results are
@@ -452,13 +465,13 @@ def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
     # results are printed to both File 16 and 17 if IPRT = 3. Cards
     # 12b and 12c are read if IPRT = 2 or 3 (see IOTOT and IOUT).
 
-    IPRT = '2'
+    IPRT = "2"
 
     # Card 12a: Min, Max and Step wavelength (nm) (Output can be different than
     # calculation...
     WPMN = WLMN
     WPMX = WLMX
-    INTVL = '1'
+    INTVL = "1"
 
     # Card 12b: Total number of output variables:
     # IOTOT = XXX #This is determined with the input of this function
@@ -474,25 +487,25 @@ def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
     # ICIRC = 1 indicates that a typical radiometer needs to be simulated. The geometry of its collimator
     # must then defined on Card 13a.
 
-    ICIRC = '0'
+    ICIRC = "0"
 
     # Card 13a (if ICIRC = 1): SLOPE, APERT, LIMIT
-    SLOPE = ''
-    APERT = ''
-    LIMIT = ''
+    SLOPE = ""
+    APERT = ""
+    LIMIT = ""
 
     ## Card 14 Option for using the scanning/smoothing virtual filter of the postprocessor.
     # The smoothed results are output on a spreadsheet-ready file, File 18 (smarts295.scn.txt). This postprocessor is
     # activated if ISCAN = 1, not if ISCAN = 0. Card 14a is read if ISCAN = 1.
 
-    ISCAN = '0'
+    ISCAN = "0"
 
     # Card 14a (if ISCAN = 1): IFILT, WV1, WV2, STEP, FWHM
-    IFILT = ''
-    WV1 = ''
-    WV2 = ''
-    STEP = ''
-    FWHM = ''
+    IFILT = ""
+    WV1 = ""
+    WV2 = ""
+    STEP = ""
+    FWHM = ""
 
     ## Card 15 ILLUM: Option for illuminance, luminous efficacy and photosynthetically active radiation (PAR)
     # calculations. These calculations take place if ILLUM = -1, 1, -2 or 2, and are bypassed if ILLUM = 0.
@@ -505,7 +518,7 @@ def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
     # calculations. This overrides the values of WLMN and WLMX on Card 11, and replaces them by 280
     # and 4000, respectively.
 
-    ILLUM = '0'
+    ILLUM = "0"
 
     ## Card  16: Option for special broadband UV calculations. Select IUV = 0 for no special UV calculation,
     # IUV = 1 to initiate such calculations. These include UVA, UVB, UV index, and
@@ -514,7 +527,7 @@ def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
     # and 400 nm. The spectral results are also printed between at least 280 and 400 nm, irrespective of
     # the IPRT, WPMN, and WPMX values.
 
-    IUV = '0'
+    IUV = "0"
 
     ## Card 17:
     # Option for solar position and air mass calculations. Set IMASS to:
@@ -523,17 +536,17 @@ def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
     # 2, if input is to be AMASS on Card 17a
     # 3, if inputs are to be YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, ZONE on Card 17a
     # 4, if inputs are to be MONTH, LATIT, DSTEP on Card 17a (for a daily calculation).
-    IMASS = '3'
+    IMASS = "3"
 
     # Card 17a: IMASS = 0 Zenith and azimuth
-    ZENITH = ''
-    AZIM = ''
+    ZENITH = ""
+    AZIM = ""
 
     # Card 17a: IMASS = 1 Elevation and Azimuth
-    ELEV = ''
+    ELEV = ""
 
     # Card 17a: IMASS = 2 Input air mass directly
-    AMASS = ''
+    AMASS = ""
 
     # Card 17a: IMASS = 3 Input date, time and coordinates
     # YEAR = '2014'
@@ -542,36 +555,186 @@ def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, WLMN, WLMX,
     # HOUR = '7'
     # LATIT = '32.'
     # LONGIT = '-110.92'
-    #ZONE = '1'
+    # ZONE = '1'
 
     # Card 17a: IMASS = 4 Input Moth, Latitude and DSTEP
-    DSTEP = ''
+    DSTEP = ""
 
-    output = _smartsAll(CMNT, ISPR, SPR, ALTIT, HEIGHT, LATIT, IATMOS, ATMOS,
-                        RH, TAIR, SEASON, TDAY, IH2O, W, IO3, IALT, AbO3, IGAS,
-                        ILOAD, ApCH2O, ApCH4, ApCO, ApHNO2, ApHNO3, ApNO,
-                        ApNO2, ApNO3, ApO3, ApSO2, qCO2, ISPCTR, AEROS, ALPHA1,
-                        ALPHA2, OMEGL, GG, ITURB, TAU5, BETA, BCHUEP, RANGE,
-                        VISI, TAU550, IALBDX, RHOX, ITILT, IALBDG, TILT, WAZIM,
-                        RHOG, WLMN, WLMX, SUNCOR, SOLARC, IPRT, WPMN, WPMX,
-                        INTVL, IOUT, ICIRC, SLOPE, APERT, LIMIT, ISCAN, IFILT,
-                        WV1, WV2, STEP, FWHM, ILLUM, IUV, IMASS, ZENITH, AZIM,
-                        ELEV, AMASS, YEAR, MONTH, DAY, HOUR, LONGIT, ZONE,
-                        DSTEP, input_directory)
+    output = _smartsAll(
+        CMNT,
+        ISPR,
+        SPR,
+        ALTIT,
+        HEIGHT,
+        LATIT,
+        IATMOS,
+        ATMOS,
+        RH,
+        TAIR,
+        SEASON,
+        TDAY,
+        IH2O,
+        W,
+        IO3,
+        IALT,
+        AbO3,
+        IGAS,
+        ILOAD,
+        ApCH2O,
+        ApCH4,
+        ApCO,
+        ApHNO2,
+        ApHNO3,
+        ApNO,
+        ApNO2,
+        ApNO3,
+        ApO3,
+        ApSO2,
+        qCO2,
+        ISPCTR,
+        AEROS,
+        ALPHA1,
+        ALPHA2,
+        OMEGL,
+        GG,
+        ITURB,
+        TAU5,
+        BETA,
+        BCHUEP,
+        RANGE,
+        VISI,
+        TAU550,
+        IALBDX,
+        RHOX,
+        ITILT,
+        IALBDG,
+        TILT,
+        WAZIM,
+        RHOG,
+        WLMN,
+        WLMX,
+        SUNCOR,
+        SOLARC,
+        IPRT,
+        WPMN,
+        WPMX,
+        INTVL,
+        IOUT,
+        ICIRC,
+        SLOPE,
+        APERT,
+        LIMIT,
+        ISCAN,
+        IFILT,
+        WV1,
+        WV2,
+        STEP,
+        FWHM,
+        ILLUM,
+        IUV,
+        IMASS,
+        ZENITH,
+        AZIM,
+        ELEV,
+        AMASS,
+        YEAR,
+        MONTH,
+        DAY,
+        HOUR,
+        LONGIT,
+        ZONE,
+        DSTEP,
+    )
 
     return output
 
 
-def _smartsAll(CMNT, ISPR, SPR, ALTIT, HEIGHT, LATIT, IATMOS, ATMOS, RH, TAIR,
-               SEASON, TDAY, IH2O, W, IO3, IALT, AbO3, IGAS, ILOAD, ApCH2O,
-               ApCH4, ApCO, ApHNO2, ApHNO3, ApNO, ApNO2, ApNO3, ApO3, ApSO2,
-               qCO2, ISPCTR, AEROS, ALPHA1, ALPHA2, OMEGL, GG, ITURB, TAU5,
-               BETA, BCHUEP, RANGE, VISI, TAU550, IALBDX, RHOX, ITILT, IALBDG,
-               TILT, WAZIM, RHOG, WLMN, WLMX, SUNCOR, SOLARC, IPRT, WPMN, WPMX,
-               INTVL, IOUT, ICIRC, SLOPE, APERT, LIMIT, ISCAN, IFILT, WV1, WV2,
-               STEP, FWHM, ILLUM, IUV, IMASS, ZENITH, AZIM, ELEV, AMASS, YEAR,
-               MONTH, DAY, HOUR, LONGIT, ZONE, DSTEP, input_directory):
-    r'''
+def _smartsAll(
+    CMNT,
+    ISPR,
+    SPR,
+    ALTIT,
+    HEIGHT,
+    LATIT,
+    IATMOS,
+    ATMOS,
+    RH,
+    TAIR,
+    SEASON,
+    TDAY,
+    IH2O,
+    W,
+    IO3,
+    IALT,
+    AbO3,
+    IGAS,
+    ILOAD,
+    ApCH2O,
+    ApCH4,
+    ApCO,
+    ApHNO2,
+    ApHNO3,
+    ApNO,
+    ApNO2,
+    ApNO3,
+    ApO3,
+    ApSO2,
+    qCO2,
+    ISPCTR,
+    AEROS,
+    ALPHA1,
+    ALPHA2,
+    OMEGL,
+    GG,
+    ITURB,
+    TAU5,
+    BETA,
+    BCHUEP,
+    RANGE,
+    VISI,
+    TAU550,
+    IALBDX,
+    RHOX,
+    ITILT,
+    IALBDG,
+    TILT,
+    WAZIM,
+    RHOG,
+    WLMN,
+    WLMX,
+    SUNCOR,
+    SOLARC,
+    IPRT,
+    WPMN,
+    WPMX,
+    INTVL,
+    IOUT,
+    ICIRC,
+    SLOPE,
+    APERT,
+    LIMIT,
+    ISCAN,
+    IFILT,
+    WV1,
+    WV2,
+    STEP,
+    FWHM,
+    ILLUM,
+    IUV,
+    IMASS,
+    ZENITH,
+    AZIM,
+    ELEV,
+    AMASS,
+    YEAR,
+    MONTH,
+    DAY,
+    HOUR,
+    LONGIT,
+    ZONE,
+    DSTEP,
+):
+    r"""
     #data = smartsAll(CMNT, ISPR, SPR, ALTIT, HEIGHT, LATIT, IATMOS, ATMOS, RH, TAIR, SEASON, TDAY, IH2O, W, IO3, IALT, AbO3, IGAS, ILOAD, ApCH2O, ApCH4, ApCO, ApHNO2, ApHNO3, ApNO,ApNO2, ApNO3, ApO3, ApSO2, qCO2, ISPCTR, AEROS, ALPHA1, ALPHA2, OMEGL, GG, ITURB, TAU5, BETA, BCHUEP, RANGE, VISI, TAU550, IALBDX, RHOX, ITILT, IALBDG,TILT, WAZIM,  RHOG, WLMN, WLMX, SUNCOR, SOLARC, IPRT, WPMN, WPMX, INTVL, IOUT, ICIRC, SLOPE, APERT, LIMIT, ISCAN, IFILT, WV1, WV2, STEP, FWHM, ILLUM,IUV, IMASS, ZENITH, ELEV, AMASS, YEAR, MONTH, DAY, HOUR, LONGIT, ZONE, DSTEP)
     # SMARTS Control Function
     #
@@ -585,7 +748,7 @@ def _smartsAll(CMNT, ISPR, SPR, ALTIT, HEIGHT, LATIT, IATMOS, ATMOS, RH, TAIR,
     #
     # Juan Russo (c) 2011
     # Silvana Ayala (c) 2018-2020
-    '''
+    """
 
     ## Init
     import os
@@ -595,24 +758,24 @@ def _smartsAll(CMNT, ISPR, SPR, ALTIT, HEIGHT, LATIT, IATMOS, ATMOS, RH, TAIR,
     file_directory = os.path.dirname(__file__)
 
     try:
-        os.remove(os.path.join(file_directory, 'smarts295.inp.txt'))
+        os.remove(os.path.join(file_directory, "smarts295.inp.txt"))
     except:
         print("")
     try:
-        os.remove(os.path.join(file_directory, 'smarts295.out.txt'))
+        os.remove(os.path.join(file_directory, "smarts295.out.txt"))
     except:
         print("")
     try:
-        os.remove(os.path.join(file_directory, 'smarts295.ext.txt'))
+        os.remove(os.path.join(file_directory, "smarts295.ext.txt"))
     except:
         print("")
     try:
-        os.remove(os.path.join(file_directory, 'smarts295.scn.txt'))
+        os.remove(os.path.join(file_directory, "smarts295.scn.txt"))
     except:
         print("")
 
-    file_open=os.path.join(os.path.dirname(__file__), 'smarts295.inp.txt')
-    f = open(file_open, 'w')
+    file_open = os.path.join(os.path.dirname(__file__), "smarts295.inp.txt")
+    f = open(file_open, "w")
 
     IOTOT = len(IOUT.split())
 
@@ -622,178 +785,180 @@ def _smartsAll(CMNT, ISPR, SPR, ALTIT, HEIGHT, LATIT, IATMOS, ATMOS, RH, TAIR,
 
     CMNT = CMNT.replace(" ", "_")
     CMNT = "'" + CMNT + "'"
-    print('{}'.format(CMNT), file=f)
+    print("{}".format(CMNT), file=f)
 
     ## Card 2: Site Pressure
-    print('{}'.format(ISPR), file=f)
+    print("{}".format(ISPR), file=f)
 
     ##Card 2a:
-    if ISPR == '0':
+    if ISPR == "0":
         # case '0' #Just input pressure.
-        print('{}'.format(SPR), file=f)
-    elif ISPR == '1':
+        print("{}".format(SPR), file=f)
+    elif ISPR == "1":
         # case '1' #Input pressure, altitude and height.
-        print('{} {} {}'.format(SPR, ALTIT, HEIGHT), file=f)
-    elif ISPR == '2':
+        print("{} {} {}".format(SPR, ALTIT, HEIGHT), file=f)
+    elif ISPR == "2":
         # case '2' #Input lat, alt and height
-        print('{} {} {}'.format(LATIT, ALTIT, HEIGHT), file=f)
+        print("{} {} {}".format(LATIT, ALTIT, HEIGHT), file=f)
     else:
         print("ISPR Error. ISPR should be 0, 1 or 2. Currently ISPR = ", ISPR)
 
         ## Card 3: Atmosphere model
-    print('{}'.format(IATMOS), file=f)
+    print("{}".format(IATMOS), file=f)
 
     ## Card 3a:
-    if IATMOS == '0':
+    if IATMOS == "0":
         # case '0' #Input TAIR, RH, SEASON, TDAY
-        print('{} {} {} {}'.format(TAIR, RH, SEASON, TDAY), file=f)
-    elif IATMOS == '1':
+        print("{} {} {} {}".format(TAIR, RH, SEASON, TDAY), file=f)
+    elif IATMOS == "1":
         # case '1' #Input reference atmosphere
         ATMOS = "'" + ATMOS + "'"
-        print('{}'.format(ATMOS), file=f)
+        print("{}".format(ATMOS), file=f)
 
     ## Card 4: Water vapor data
-    print('{}'.format(IH2O), file=f)
+    print("{}".format(IH2O), file=f)
 
     ## Card 4a
-    if IH2O == '0':
+    if IH2O == "0":
         # case '0'
-        print('{}'.format(W), file=f)
-    elif IH2O == '1':
+        print("{}".format(W), file=f)
+    elif IH2O == "1":
         # case '1'
         # The subcard 4a is skipped
         print("")
 
     ## Card 5: Ozone abundance
-    print('{}'.format(IO3), file=f)
+    print("{}".format(IO3), file=f)
 
     ## Card 5a
-    if IO3 == '0':
+    if IO3 == "0":
         # case '0'
-        print('{} {}'.format(IALT, AbO3), file=f)
-    elif IO3 == '1':
+        print("{} {}".format(IALT, AbO3), file=f)
+    elif IO3 == "1":
         # case '1'
         # The subcard 5a is skipped and default values are used from selected
         # reference atmosphere in Card 3.
         print("")
 
     ## Card 6: Gaseous absorption and atmospheric pollution
-    print('{}'.format(IGAS), file=f)
+    print("{}".format(IGAS), file=f)
 
     ## Card 6a:  Option for tropospheric pollution
-    if IGAS == '0':
+    if IGAS == "0":
         # case '0'
-        print('{}'.format(ILOAD), file=f)
+        print("{}".format(ILOAD), file=f)
 
         ## Card 6b: Concentration of Pollutants
-        if ILOAD == '0':
+        if ILOAD == "0":
             # case '0'
-            print('{} {} {} {} {} {} {} {} {} {} '.format(ApCH2O, ApCH4, ApCO,
-                                                          ApHNO2, ApHNO3, ApNO,
-                                                          ApNO2, ApNO3, ApO3,
-                                                          ApSO2), file=f)
-        elif ILOAD == '1':
+            print(
+                "{} {} {} {} {} {} {} {} {} {} ".format(
+                    ApCH2O, ApCH4, ApCO, ApHNO2, ApHNO3, ApNO, ApNO2, ApNO3, ApO3, ApSO2
+                ),
+                file=f,
+            )
+        elif ILOAD == "1":
             # case '1'
             # The subcard 6b is skipped and values of PRISTINE
             # ATMOSPHERIC conditions are assumed
             print("")
-        elif ILOAD == '2' or ILOAD == '3' or ILOAD == '4':
+        elif ILOAD == "2" or ILOAD == "3" or ILOAD == "4":
             # case {'2', '3', '4'}
             # The subcard 6b is skipped and value of ILOAD will be used
             # as LIGHT POLLUTION (ILOAD = 2), MODERATE POLLUTION (ILOAD = 3),
             # and SEVERE POLLUTION (ILOAD = 4).
             print("")
 
-    elif IGAS == '1':
+    elif IGAS == "1":
         # case '1'
         # The subcard 6a is skipped, and values are for default average
         # profiles.
         print("")
 
     ## Card 7:  CO2 columnar volumetric concentration (ppmv)
-    print('{}'.format(qCO2), file=f)
+    print("{}".format(qCO2), file=f)
 
     ## Card 7a: Option of proper extraterrestrial spectrum
-    print('{}'.format(ISPCTR), file=f)
+    print("{}".format(ISPCTR), file=f)
 
     ## Card 8: Aerosol model selection out of twelve
     AEROS = "'" + AEROS + "'"
 
-    print('{}'.format(AEROS), file=f)
+    print("{}".format(AEROS), file=f)
 
     ## Card 8a: If the aerosol model is 'USER' for user supplied information
     if AEROS == "'USER'":
-        print('{} {} {} {}'.format(ALPHA1, ALPHA2, OMEGL, GG), file=f)
+        print("{} {} {} {}".format(ALPHA1, ALPHA2, OMEGL, GG), file=f)
     else:
         # The subcard 8a is skipped
         print("")
 
     ## Card 9: Option to select turbidity model
-    print('{}'.format(ITURB), file=f)
+    print("{}".format(ITURB), file=f)
 
     ## Card 9a
-    if ITURB == '0':
+    if ITURB == "0":
         # case '0'
-        print('{}'.format(TAU5), file=f)
-    elif ITURB == '1':
+        print("{}".format(TAU5), file=f)
+    elif ITURB == "1":
         # case '1'
-        print('{}'.format(BETA), file=f)
-    elif ITURB == '2':
+        print("{}".format(BETA), file=f)
+    elif ITURB == "2":
         # case '2'
-        print('{}'.format(BCHUEP), file=f)
-    elif ITURB == '3':
+        print("{}".format(BCHUEP), file=f)
+    elif ITURB == "3":
         # case '3'
-        print('{}'.format(RANGE), file=f)
-    elif ITURB == '4':
+        print("{}".format(RANGE), file=f)
+    elif ITURB == "4":
         # case '4'
-        print('{}'.format(VISI), file=f)
-    elif ITURB == '5':
+        print("{}".format(VISI), file=f)
+    elif ITURB == "5":
         # case '5'
-        print('{}'.format(TAU550), file=f)
+        print("{}".format(TAU550), file=f)
     else:
         print(
-            "Error: Card 9 needs to be input. Assign a valid value to ITURB = ",
-            ITURB)
+            "Error: Card 9 needs to be input. Assign a valid value to ITURB = ", ITURB
+        )
 
     ## Card 10:  Select zonal albedo
-    print('{}'.format(IALBDX), file=f)
+    print("{}".format(IALBDX), file=f)
 
     ## Card 10a: Input fix broadband lambertial albedo RHOX
-    if IALBDX == '-1':
-        print('{}'.format(RHOX), file=f)
+    if IALBDX == "-1":
+        print("{}".format(RHOX), file=f)
     else:
         print("")
         # The subcard 10a is skipped.
 
     ## Card 10b: Tilted surface calculation flag
-    print('{}'.format(ITILT), file=f)
+    print("{}".format(ITILT), file=f)
 
     ## Card 10c: Tilt surface calculation parameters
-    if ITILT == '1':
-        print('{} {} {}'.format(IALBDG, TILT, WAZIM), file=f)
+    if ITILT == "1":
+        print("{} {} {}".format(IALBDG, TILT, WAZIM), file=f)
 
         ##Card 10d: If tilt calculations are performed and zonal albedo of
         ##foreground.
-        if IALBDG == '-1':
-            print('{}'.format(RHOG), file=f)
+        if IALBDG == "-1":
+            print("{}".format(RHOG), file=f)
         else:
             print("")
             # The subcard is skipped
 
     ## Card 11: Spectral ranges for calculations
-    print('{} {} {} {}'.format(WLMN, WLMX, SUNCOR, SOLARC), file=f)
+    print("{} {} {} {}".format(WLMN, WLMX, SUNCOR, SOLARC), file=f)
 
     ## Card 12: Output selection.
-    print('{}'.format(IPRT), file=f)
+    print("{}".format(IPRT), file=f)
 
     ## Card 12a: For spectral results (IPRT >= 1)
     if float(IPRT) >= 1:
-        print('{} {} {}'.format(WPMN, WPMX, INTVL), file=f)
+        print("{} {} {}".format(WPMN, WPMX, INTVL), file=f)
 
         ## Card 12b & Card 12c:
         if float(IPRT) == 2 or float(IPRT) == 3:
-            print('{}'.format(IOTOT), file=f)
-            print('{}'.format(IOUT), file=f)
+            print("{}".format(IOTOT), file=f)
+            print("{}".format(IOUT), file=f)
         else:
             print("")
             # The subcards 12b and 12c are skipped.
@@ -802,64 +967,66 @@ def _smartsAll(CMNT, ISPR, SPR, ALTIT, HEIGHT, LATIT, IATMOS, ATMOS, RH, TAIR,
         # The subcard 12a is skipped
 
     ## Card 13: Circumsolar calculations
-    print('{}'.format(ICIRC), file=f)
+    print("{}".format(ICIRC), file=f)
 
     ## Card 13a:  Simulated radiometer parameters
-    if ICIRC == '1':
-        print('{} {} {}'.format(SLOPE, APERT, LIMIT), file=f)
+    if ICIRC == "1":
+        print("{} {} {}".format(SLOPE, APERT, LIMIT), file=f)
     else:
         print("")
         # The subcard 13a is skipped since no circumsolar calculations or
         # simulated radiometers have been requested.
 
     ## Card 14:  Scanning/Smoothing virtual filter postprocessor
-    print('{}'.format(ISCAN), file=f)
+    print("{}".format(ISCAN), file=f)
 
     ## Card 14a:  Simulated radiometer parameters
-    if ISCAN == '1':
-        print('{} {} {} {} {}'.format(IFILT, WV1, WV2, STEP, FWHM), file=f)
+    if ISCAN == "1":
+        print("{} {} {} {} {}".format(IFILT, WV1, WV2, STEP, FWHM), file=f)
     else:
         print("")
         # The subcard 14a is skipped since no postprocessing is simulated.
 
     ## Card 15: Illuminace, luminous efficacy and photosythetically active radiarion calculations
-    print('{}'.format(ILLUM), file=f)
+    print("{}".format(ILLUM), file=f)
 
     ## Card 16: Special broadband UV calculations
-    print('{}'.format(IUV), file=f)
+    print("{}".format(IUV), file=f)
 
     ## Card 17:  Option for solar position and air mass calculations
-    print('{}'.format(IMASS), file=f)
+    print("{}".format(IMASS), file=f)
 
     ## Card 17a: Solar position parameters:
-    if IMASS == '0':
+    if IMASS == "0":
         # case '0' #Enter Zenith and Azimuth of the sun
-        print('{} {}'.format(ZENITH, AZIM), file=f)
-    elif IMASS == '1':
+        print("{} {}".format(ZENITH, AZIM), file=f)
+    elif IMASS == "1":
         # case '1' #Enter Elevation and Azimuth of the sun
-        print('{} {}'.format(ELEV, AZIM), file=f)
-    elif IMASS == '2':
+        print("{} {}".format(ELEV, AZIM), file=f)
+    elif IMASS == "2":
         # case '2' #Enter air mass directly
-        print('{}'.format(AMASS), file=f)
-    elif IMASS == '3':
+        print("{}".format(AMASS), file=f)
+    elif IMASS == "3":
         # case '3' #Enter date, time and latitude
-        print('{} {} {} {} {} {} {}'.format(YEAR, MONTH, DAY, HOUR, LATIT,
-                                            LONGIT, ZONE), file=f)
-    elif IMASS == '4':
+        print(
+            "{} {} {} {} {} {} {}".format(YEAR, MONTH, DAY, HOUR, LATIT, LONGIT, ZONE),
+            file=f,
+        )
+    elif IMASS == "4":
         # case '4' #Enter date and time and step in min for a daily calculation.
-        print('{}, {}, {}'.format(MONTH, LATIT, DSTEP), file=f)
+        print("{}, {}, {}".format(MONTH, LATIT, DSTEP), file=f)
 
     ## Input Finalization
-    print('', file=f)
+    print("", file=f)
     f.close()
 
     ## Run SMARTS 2.9.5
     # dump = os.system('smarts295bat.exe')
 
-    file_directory=os.path.dirname(__file__)
+    file_directory = os.path.dirname(__file__)
 
     command = ["yes | ./program.exe"]
-#    command = "./program.exe"
+    #    command = "./program.exe"
     p = subprocess.Popen(command, stdin=subprocess.PIPE, shell=True, cwd=file_directory)
     p.wait()
 
@@ -869,31 +1036,32 @@ def _smartsAll(CMNT, ISPR, SPR, ALTIT, HEIGHT, LATIT, IATMOS, ATMOS, RH, TAIR,
     try:
         data = pd.read_csv(open_csv, delim_whitespace=True)
     except:
-        print(f"the file directory is {open_csv}. The directory is incorrect, the dataframe is empty.")
+        print(
+            f"the file directory is {open_csv}. The directory is incorrect, the dataframe is empty."
+        )
         data = pd.DataFrame()
 
     try:
-        os.remove(os.path.join(file_directory, 'smarts295.inp.txt'))
+        os.remove(os.path.join(file_directory, "smarts295.inp.txt"))
     except:
         print("")
     try:
-        os.remove(os.path.join(file_directory, 'smarts295.out.txt'))
+        os.remove(os.path.join(file_directory, "smarts295.out.txt"))
     except:
         print("")
     try:
-        os.remove(os.path.join(file_directory, 'smarts295.ext.txt'))
+        os.remove(os.path.join(file_directory, "smarts295.ext.txt"))
     except:
         print("")
     try:
-        os.remove(os.path.join(file_directory, 'smarts295.scn.txt'))
+        os.remove(os.path.join(file_directory, "smarts295.scn.txt"))
     except:
         print("")
 
     return data
 
 
-
 if __name__ == "__main__":
-    #def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT)
-    df=SMARTSSpectra('2 3', '2001', '6', '1', '12', '32.', '-110.92')
+    # def SMARTSSpectra(IOUT, YEAR, MONTH, DAY, HOUR, LATIT, LONGIT)
+    df = SMARTSSpectra("2 3", "2001", "6", "1", "12", "32.", "-110.92")
     print(df)
