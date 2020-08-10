@@ -21,31 +21,43 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG, format=log_format)
 def calculate_smarts_parameters(year, lat, lon, number_hours, cell_type,
                                 input_directory,
                                 surface_tilt, surface_azimuth,
+                                atmos_data,
                                 WLMN=350, WLMX=1200):
 
     """
-
-    :param year: int
+    Parameters
+    ----------
+    year: int
         year of interest
-    :param lat: str
+    lat: str
         latitude ending with a ".", e.g. "45."
-    :param lon: int
+    lon: int
         longitude
-    :param number_hours: int
+    number_hours: int
         number of hours until simulation stops. For one year enter 8760.
-    :param WLMN: int
-        minimum wavelength of the spectrum. By default this is 280 nm.
-    :param WLMX: int
-        maximum wavelength of the spectrum. By default this is 1200 nm.
-    :param cell_type: list
+    cell_type: list
         list of cells for which the Jsc should be calculated.
-    :param input_directory: str
+    input_directory: str
         name of the input directory
-    :return: :pd.Dataframe()
-           including ghi, temperature, wind_speed, Jsc_"cell_type"
+    atmos_data: :pd.Dataframe()
+        with datetimeindex and columns for 'temp_air' and 'wind_speed'
+    WLMN: int
+        minimum wavelength of the spectrum. By default this is 280 nm.
+    WLMX: int
+        maximum wavelength of the spectrum. By default this is 1200 nm.
+
+
+    Returns
+    --------
+    :pd.Dataframe()
+        including ghi, temperature, wind_speed, Jsc_"cell_type"
     """
-    # load atmos data from era5
-    atmos_data= era5.load_era5_weatherdata(lat, lon, year, variable="perosi")
+
+    #check if atmos_data is in given as an input variable
+    if atmos_data is None:
+        logging.info("loading atmos data from era5 data set")
+        atmos_data = era5.load_era5_weatherdata(lat, lon, year,
+                                                variable="perosi")
     delta = pd.to_timedelta(30, unit='m')
     atmos_data.index = atmos_data.index + delta
     atmos_data['davt'] = atmos_data["temp_air"].resample('D').mean()
@@ -58,13 +70,13 @@ def calculate_smarts_parameters(year, lat, lon, number_hours, cell_type,
     #define counter for number of hours to be calculated
     c = 0
     #define time interval of one year
-    time = pd.date_range(start=f'1/1/{year}', end=f'31/12/{year}', freq='H')
+    #time = pd.date_range(start=f'1/1/{year}', end=f'31/12/{year}', freq='H')
     # calculate Jsc for every timestep
     result=pd.DataFrame()
     logging.info("loading spectral weather data from SMARTS Nrel and "
                  "calculating Isc for every timestep")
-    for timestep in time:
-        if timestep.month in range(3, 8):
+    for index, row in atmos_data.iterrows():
+        if index.month in range(3, 8):
             season = 'SUMMER'
         else:
             season = 'WINTER'
@@ -76,13 +88,13 @@ def calculate_smarts_parameters(year, lat, lon, number_hours, cell_type,
         lat_spectrum=str(lat)[:decimals_lat]
         spectrum = smarts.SMARTSSpectra(
             IOUT=iout, YEAR=str(year),
-            MONTH=str(timestep.month),
-            DAY=str(timestep.day), HOUR=str(timestep.hour),
+            MONTH=str(index.month),
+            DAY=str(index.day), HOUR=str(index.hour),
             LATIT=lat_spectrum,
             LONGIT=str(lon), WLMN=WLMN,
             WLMX=WLMX,
-            TAIR=str(atmos_data.at[timestep, 'temp_air']),
-            TDAY=str(atmos_data.at[timestep, 'davt']),
+            TAIR=str(atmos_data.at[index, 'temp_air']),
+            TDAY=str(atmos_data.at[index, 'davt']),
             SEASON=season,
             ZONE=1,
             TILT=str(surface_tilt),
@@ -109,8 +121,8 @@ def calculate_smarts_parameters(year, lat, lon, number_hours, cell_type,
 
             # return Jsc and ghi = 0 if the spectrum is empty
             if spectrum.empty == True:
-                result.at[timestep, "Jsc_" + str(x)] = 0
-                result.at[timestep, "ghi"] = 0
+                result.at[index, "Jsc_" + str(x)] = 0
+                result.at[index, "ghi"] = 0
 
             else:
                 if not spectrum.index.name == "Wvlgth":
@@ -119,11 +131,11 @@ def calculate_smarts_parameters(year, lat, lon, number_hours, cell_type,
                 Jsc_lambda = (spectrum["Global_tilt_photon_irrad"] * EQE[
                     "EQE"]) * q
                 Jsc_lambda.fillna(0, inplace=True)
-                result.at[timestep, "Jsc_" + str(x)] = Jsc_lambda.sum() # in A/m²
-                result.at[timestep, "ghi"] = spectrum["Global_tilted_irradiance"].sum() # in W/m²
+                result.at[index, "Jsc_" + str(x)] = Jsc_lambda.sum() # in A/m²
+                result.at[index, "ghi"] = spectrum["Global_tilted_irradiance"].sum() # in W/m²
 
-        result.at[timestep, "temp"] = atmos_data.at[timestep, 'temp_air']
-        result.at[timestep, "wind_speed"] = atmos_data.at[timestep, "wind_speed"]
+        result.at[index, "temp"] = atmos_data.at[index, 'temp_air']
+        result.at[index, "wind_speed"] = atmos_data.at[index, "wind_speed"]
 
         # check if number of hours is reached
         c = c + 1
@@ -133,7 +145,7 @@ def calculate_smarts_parameters(year, lat, lon, number_hours, cell_type,
 
 
 def create_timeseries(
-        lat, lon, surface_azimuth, surface_tilt, year,
+        lat, lon, surface_azimuth, surface_tilt, atmos_data, year,
         cell_type, number_hours,
         input_directory=None, plot=True
     ):
@@ -170,7 +182,8 @@ def create_timeseries(
                                                   cell_type=cell_type,
                                                   input_directory=input_directory,
                                                   surface_tilt=surface_tilt,
-                                                  surface_azimuth=surface_azimuth
+                                                  surface_azimuth=surface_azimuth,
+                                                  atmos_data=atmos_data
     )
 
     #calculate cell temperature characteristics
@@ -205,7 +218,7 @@ def create_timeseries(
 
 
 def create_pero_si_timeseries(year, lat, lon, surface_azimuth,
-        surface_tilt, number_hours,
+        surface_tilt, number_hours, atmos_data=None,
         input_directory=None, psi_type="Chen"):
 
     """
@@ -237,7 +250,7 @@ def create_pero_si_timeseries(year, lat, lon, surface_azimuth,
 
     timeseries=create_timeseries(
         lat=lat, lon=lon, surface_azimuth=surface_azimuth,
-        surface_tilt=surface_tilt, year=year,
+        surface_tilt=surface_tilt, atmos_data=atmos_data, year=year,
         cell_type=cell_type, number_hours=number_hours,
         input_directory=input_directory, plot=True
     )
