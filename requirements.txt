@@ -2,3 +2,4 @@ git+https://github.com/greco-project/cpvtopvlib.git@master
 feedinlib==0.1.0rc2
 importlib
 importlib_resources
+pandas==0.24.2
