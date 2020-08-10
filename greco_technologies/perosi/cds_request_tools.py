@@ -160,9 +160,7 @@ def _format_cds_request_datespan(start_date, end_date):
     return answer
 
 
-def _format_cds_request_area(
-    latitude_span=None, longitude_span=None, grid=None
-):
+def _format_cds_request_area(latitude_span=None, longitude_span=None, grid=None):
     """
     Format the area between two given latitude and longitude spans in order
     to submit a CDS request
@@ -261,10 +259,7 @@ def _format_cds_request_position(latitude, longitude, grid=None):
     # Find the nearest point on the grid corresponding to the given latitude
     # and longitude
     grid_point = xr.Dataset(
-        {
-            "lat": np.arange(90, -90, -grid[0]),
-            "lon": np.arange(-180, 180.0, grid[1]),
-        }
+        {"lat": np.arange(90, -90, -grid[0]), "lon": np.arange(-180, 180.0, grid[1]),}
     ).sel(lat=latitude, lon=longitude, method="nearest")
 
     # Prepare an area which consists of only one grid point
@@ -275,12 +270,7 @@ def _format_cds_request_position(latitude, longitude, grid=None):
 
 
 def get_cds_data_from_datespan_and_position(
-    start_date,
-    end_date,
-    latitude=None,
-    longitude=None,
-    grid=None,
-    **cds_params
+    start_date, end_date, latitude=None, longitude=None, grid=None, **cds_params
 ):
     """
     Format request for data from the Climate Data Store (CDS)
@@ -334,9 +324,7 @@ def get_cds_data_from_datespan_and_position(
     # size
     # if both longitude and latitude are provided as number, select single
     # position
-    if isinstance(longitude, (int, float)) or isinstance(
-        latitude, (int, float)
-    ):
+    if isinstance(longitude, (int, float)) or isinstance(latitude, (int, float)):
         request_area = _format_cds_request_position(latitude, longitude, grid)
         cds_params.update(request_area)
     # if longitude or latitude is provided as list and the other one is either

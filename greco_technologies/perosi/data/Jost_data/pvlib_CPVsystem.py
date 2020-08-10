@@ -6,6 +6,7 @@ from pvlib.tools import _build_kwargs
 from pvlib import pvsystem
 from sklearn.metrics import mean_squared_error
 
+
 class CPVSystem(object):
     """
     The CPVSystem class defines a set of CPV system attributes and modeling
@@ -63,12 +64,19 @@ class CPVSystem(object):
         Included for compatibility, but not used.
     """
 
-    def __init__(self,
-                 module=None, module_parameters=None,
-                 modules_per_string=1, strings_per_inverter=1,
-                 inverter=None, inverter_parameters=None,
-                 racking_model='open_rack_cell_glassback',
-                 losses_parameters=None, name=None, **kwargs):
+    def __init__(
+        self,
+        module=None,
+        module_parameters=None,
+        modules_per_string=1,
+        strings_per_inverter=1,
+        inverter=None,
+        inverter_parameters=None,
+        racking_model="open_rack_cell_glassback",
+        losses_parameters=None,
+        name=None,
+        **kwargs
+    ):
 
         self.name = name
 
@@ -96,10 +104,10 @@ class CPVSystem(object):
         self.racking_model = racking_model
 
     def __repr__(self):
-        attrs = ['name', 'module', 'inverter', 'racking_model']
-        return ('CPVSystem: \n  ' + '\n  '.join(
-            ('{}: {}'.format(attr, getattr(self, attr)) for attr in attrs)))
-
+        attrs = ["name", "module", "inverter", "racking_model"]
+        return "CPVSystem: \n  " + "\n  ".join(
+            ("{}: {}".format(attr, getattr(self, attr)) for attr in attrs)
+        )
 
     def calcparams_pvsyst(self, effective_irradiance, temp_cell):
         """
@@ -120,15 +128,26 @@ class CPVSystem(object):
         See pvsystem.calcparams_pvsyst for details
         """
 
-        kwargs = _build_kwargs(['gamma_ref', 'mu_gamma', 'I_L_ref', 'I_o_ref',
-                                'R_sh_ref', 'R_sh_0', 'R_sh_exp',
-                                'R_s', 'alpha_sc', 'EgRef',
-                                'irrad_ref', 'temp_ref',
-                                'cells_in_series'],
-                               self.module_parameters)
+        kwargs = _build_kwargs(
+            [
+                "gamma_ref",
+                "mu_gamma",
+                "I_L_ref",
+                "I_o_ref",
+                "R_sh_ref",
+                "R_sh_0",
+                "R_sh_exp",
+                "R_s",
+                "alpha_sc",
+                "EgRef",
+                "irrad_ref",
+                "temp_ref",
+                "cells_in_series",
+            ],
+            self.module_parameters,
+        )
 
-        return pvsystem.calcparams_pvsyst(effective_irradiance,
-                                          temp_cell, **kwargs)
+        return pvsystem.calcparams_pvsyst(effective_irradiance, temp_cell, **kwargs)
 
     def pvsyst_celltemp(self, poa_global, temp_air, wind_speed=1.0):
         """
@@ -144,16 +163,21 @@ class CPVSystem(object):
         See pvsystem.pvsyst_celltemp for details
         """
 
-        kwargs = _build_kwargs(['eta_m', 'alpha_absorption'],
-                               self.module_parameters)
+        kwargs = _build_kwargs(["eta_m", "alpha_absorption"], self.module_parameters)
 
-        return pvsystem.pvsyst_celltemp(poa_global, temp_air, wind_speed,
-                                        model_params=self.racking_model,
-                                        **kwargs)
+        return pvsystem.pvsyst_celltemp(
+            poa_global, temp_air, wind_speed, model_params=self.racking_model, **kwargs
+        )
 
-    def singlediode(self, photocurrent, saturation_current,
-                    resistance_series, resistance_shunt, nNsVth,
-                    ivcurve_pnts=None):
+    def singlediode(
+        self,
+        photocurrent,
+        saturation_current,
+        resistance_series,
+        resistance_shunt,
+        nNsVth,
+        ivcurve_pnts=None,
+    ):
         """Wrapper around the :py:func:`pvsystem.singlediode` function.
 
         Parameters
@@ -165,19 +189,24 @@ class CPVSystem(object):
         See pvsystem.singlediode for details
         """
 
-        return pvsystem.singlediode(photocurrent, saturation_current,
-                                    resistance_series, resistance_shunt,
-                                    nNsVth, ivcurve_pnts=ivcurve_pnts)
+        return pvsystem.singlediode(
+            photocurrent,
+            saturation_current,
+            resistance_series,
+            resistance_shunt,
+            nNsVth,
+            ivcurve_pnts=ivcurve_pnts,
+        )
 
     def optical_transmission_losses(self, aoi):
 
-        '''
+        """
         optical transmission losses caused by the lens
 
         :param numeric: dni at a certain timestep
         :param numeric: aoi at a certain timestep
         :return: float, new dni minus optical tranmission losses
-        '''
+        """
 
         c0 = 4.54545455e-09
         c1 = -2.21212121e-06
@@ -203,17 +232,33 @@ class CPVSystem(object):
         else:
             return 0
 
-        Rs = abs((n1 * math.cos(math.radians(theta)) - n2 * np.sqrt(
-            1 - ((n1 / n2) * np.sin(math.radians(theta))) ** 2.0)) /
-                 (n1 * np.cos(math.radians(theta)) + n2 * np.sqrt(1 - (
-                             (n1 / n2) * np.sin(
-                         math.radians(theta))) ** 2.0))) ** 2
+        Rs = (
+            abs(
+                (
+                    n1 * math.cos(math.radians(theta))
+                    - n2 * np.sqrt(1 - ((n1 / n2) * np.sin(math.radians(theta))) ** 2.0)
+                )
+                / (
+                    n1 * np.cos(math.radians(theta))
+                    + n2 * np.sqrt(1 - ((n1 / n2) * np.sin(math.radians(theta))) ** 2.0)
+                )
+            )
+            ** 2
+        )
 
-        Rp = abs((n1 * np.sqrt(1 - ((n1 / n2) * np.sin(
-            math.radians(theta))) ** 2.0) - n2 * np.cos(math.radians(theta))) /
-                 (n1 * np.sqrt(1 - ((n1 / n2) * np.sin(
-                     math.radians(theta))) ** 2.0) + n2 * np.cos(
-                     math.radians(theta)))) ** 2
+        Rp = (
+            abs(
+                (
+                    n1 * np.sqrt(1 - ((n1 / n2) * np.sin(math.radians(theta))) ** 2.0)
+                    - n2 * np.cos(math.radians(theta))
+                )
+                / (
+                    n1 * np.sqrt(1 - ((n1 / n2) * np.sin(math.radians(theta))) ** 2.0)
+                    + n2 * np.cos(math.radians(theta))
+                )
+            )
+            ** 2
+        )
 
         Reff = 0.5 * (Rs + Rp)
         glass_transmission = (1.0 - Reff + glass_ar_offset) ** 2
@@ -245,7 +290,7 @@ class CPVSystem(object):
 
     def UF_corrected_DNI(self, am, t_ambient, dni):
 
-        '''
+        """
         The approach follows the model of Gerstmaier (Quelle), promoting a Utilization Faktor
         that reflects the spectral (AM), temperature (Tamb) and DNI dependencies of
         multijunction cells. The Utilization Factor is multiplied with the DNI.
@@ -264,7 +309,7 @@ class CPVSystem(object):
 
         :return: The altered DNI that includes the parametrization of multijunction
                 cells
-        '''
+        """
 
         uf_am = ufam(am)
         uf_dni = ufdni(dni)
@@ -347,36 +392,55 @@ class StaticCPVSystem(CPVSystem):
         Included for compatibility, but not used.
     """
 
-    def __init__(self,
-                 surface_tilt=0, surface_azimuth=180,
-                 module=None, module_parameters=None,
-                 modules_per_string=1, strings_per_inverter=1,
-                 inverter=None, inverter_parameters=None,
-                 racking_model='open_rack_cell_glassback',
-                 losses_parameters=None, name=None, **kwargs):
+    def __init__(
+        self,
+        surface_tilt=0,
+        surface_azimuth=180,
+        module=None,
+        module_parameters=None,
+        modules_per_string=1,
+        strings_per_inverter=1,
+        inverter=None,
+        inverter_parameters=None,
+        racking_model="open_rack_cell_glassback",
+        losses_parameters=None,
+        name=None,
+        **kwargs
+    ):
 
         self.surface_tilt = surface_tilt
         self.surface_azimuth = surface_azimuth
 
-        CPVSystem.__init__(self,
-                           module, module_parameters, modules_per_string,
-                           strings_per_inverter, inverter, inverter_parameters,
-                           racking_model, losses_parameters, name, **kwargs)
+        CPVSystem.__init__(
+            self,
+            module,
+            module_parameters,
+            modules_per_string,
+            strings_per_inverter,
+            inverter,
+            inverter_parameters,
+            racking_model,
+            losses_parameters,
+            name,
+            **kwargs
+        )
 
     def __repr__(self):
-        attrs = ['name', 'module', 'inverter', 'racking_model']
-        return ('StaticCPVSystem: \n  ' + '\n  '.join(
-            ('{}: {}'.format(attr, getattr(self, attr)) for attr in attrs)))
+        attrs = ["name", "module", "inverter", "racking_model"]
+        return "StaticCPVSystem: \n  " + "\n  ".join(
+            ("{}: {}".format(attr, getattr(self, attr)) for attr in attrs)
+        )
+
 
 def optical_transmission_losses(aoi):
 
-    '''
+    """
     optical transmission losses caused by the lens
 
     :param numeric: dni at a certain timestep
     :param numeric: aoi at a certain timestep
     :return: float, new dni minus optical tranmission losses
-    '''
+    """
 
     c0 = 4.54545455e-09
     c1 = -2.21212121e-06
@@ -390,6 +454,7 @@ def optical_transmission_losses(aoi):
         ot = c4 + c3 * aoi + c2 * aoi ** 2 + c1 * aoi ** 3 + c0 * aoi ** 4
         return ot
 
+
 def glass_transmission_losses(aoi):  # todo: find mistake for aoi=59°
 
     # this is an insolight specific anti-reflection coating
@@ -402,21 +467,38 @@ def glass_transmission_losses(aoi):  # todo: find mistake for aoi=59°
     else:
         return 0
 
-    Rs = abs((n1 * math.cos(math.radians(theta)) - n2 * np.sqrt(
-        1 - ((n1 / n2) * np.sin(math.radians(theta))) ** 2.0)) /
-             (n1 * np.cos(math.radians(theta)) + n2 * np.sqrt(1 - (
-                         (n1 / n2) * np.sin(
-                     math.radians(theta))) ** 2.0))) ** 2
+    Rs = (
+        abs(
+            (
+                n1 * math.cos(math.radians(theta))
+                - n2 * np.sqrt(1 - ((n1 / n2) * np.sin(math.radians(theta))) ** 2.0)
+            )
+            / (
+                n1 * np.cos(math.radians(theta))
+                + n2 * np.sqrt(1 - ((n1 / n2) * np.sin(math.radians(theta))) ** 2.0)
+            )
+        )
+        ** 2
+    )
 
-    Rp = abs((n1 * np.sqrt(1 - ((n1 / n2) * np.sin(
-        math.radians(theta))) ** 2.0) - n2 * np.cos(math.radians(theta))) /
-             (n1 * np.sqrt(1 - ((n1 / n2) * np.sin(
-                 math.radians(theta))) ** 2.0) + n2 * np.cos(
-                 math.radians(theta)))) ** 2
+    Rp = (
+        abs(
+            (
+                n1 * np.sqrt(1 - ((n1 / n2) * np.sin(math.radians(theta))) ** 2.0)
+                - n2 * np.cos(math.radians(theta))
+            )
+            / (
+                n1 * np.sqrt(1 - ((n1 / n2) * np.sin(math.radians(theta))) ** 2.0)
+                + n2 * np.cos(math.radians(theta))
+            )
+        )
+        ** 2
+    )
 
     Reff = 0.5 * (Rs + Rp)
     glass_transmission = (1.0 - Reff + glass_ar_offset) ** 2
     return glass_transmission
+
 
 def ufam(am):
     a0 = 3.14343721e-03
@@ -424,6 +506,7 @@ def ufam(am):
     a2 = -8.37260985e-08
 
     return a0 + a1 * am + a2 * am ** 2
+
 
 def ufdni(dni):
 
@@ -436,11 +519,13 @@ def ufdni(dni):
     else:
         return 0
 
+
 def uftamb(t_ambient):
     t0 = 3.18368513e-03
     t1 = 6.47684709e-06
 
     return t0 + t1 * t_ambient
+
 
 def get_single_util_factor(x, thld, m_low, m_high):
     """
@@ -474,9 +559,11 @@ def get_single_util_factor(x, thld, m_low, m_high):
     return single_uf
 
 
-def calculate_utilization_factor(uf_am, uf_temp, weight_am, weight_temp, calculate_ufdni=False):
+def calculate_utilization_factor(
+    uf_am, uf_temp, weight_am, weight_temp, calculate_ufdni=False
+):
 
-    '''
+    """
     The approach follows the model of Gerstmaier (Quelle), promoting a Utilization Faktor
     that reflects the spectral (AM), temperature (Tamb) and DNI dependencies of
     multijunction cells. The Utilization Factor is multiplied with the DNI.
@@ -497,7 +584,7 @@ def calculate_utilization_factor(uf_am, uf_temp, weight_am, weight_temp, calcula
 
     :return: The altered DNI that includes the parametrization of multijunction
             cells
-    '''
+    """
 
     #    UF = c1 * uf_am + c2 * uf_dni + c3 * uf_tamb
 
@@ -505,11 +592,17 @@ def calculate_utilization_factor(uf_am, uf_temp, weight_am, weight_temp, calcula
     if not calculate_ufdni:
         UF = np.multiply(weight_am, uf_am) + np.multiply(weight_temp, uf_temp)
     else:
-        UF = np.multiply(weight_am, uf_am) +np.multiply(weight_dni, uf_dni)+ np.multiply(weight_temp, uf_temp)
+        UF = (
+            np.multiply(weight_am, uf_am)
+            + np.multiply(weight_dni, uf_dni)
+            + np.multiply(weight_temp, uf_temp)
+        )
 
     return UF
 
+
 ########helpers functions################
+
 
 def fit_sde_sandia(V, I, Voc, Isc, Vmp, Imp, vlim=0.2, ilim=0.1):
     """ Fits the single diode equation to an IV curve.
@@ -558,12 +651,12 @@ def fit_sde_sandia(V, I, Voc, Isc, Vmp, Imp, vlim=0.2, ilim=0.1):
     beta[0] = np.nan
     beta[1] = np.nan
     idx = len(V <= vlim * Voc)
-    while np.isnan(beta[1]) and (idx<=len(V)):
+    while np.isnan(beta[1]) and (idx <= len(V)):
         try:
             p = np.polyfit(V[:idx], I[:idx], deg=1)
             if p[1] < 0:
                 beta[0] = p[0]
-                beta[1] = -p[1] # sign change to get positive parameter value
+                beta[1] = -p[1]  # sign change to get positive parameter value
         except:
             pass
         if np.isnan(beta[1]):
@@ -593,35 +686,32 @@ def fit_sde_sandia(V, I, Voc, Isc, Vmp, Imp, vlim=0.2, ilim=0.1):
         I0_Voc = _calc_I0(IL, 0, Voc, Gp, Rs, beta[3])
         if (I0_Vmp > 0) and (I0_Voc > 0):
             I0 = 0.5 * (I0_Vmp + I0_Voc)
-        elif (I0_Vmp > 0):
+        elif I0_Vmp > 0:
             I0 = I0_Vmp
-        elif (I0_Voc > 0):
+        elif I0_Voc > 0:
             I0 = I0_Voc
         else:
             I0 = np.nan
 
     return IL, I0, Rs, Rsh, nNsVth
 
+
 def _calc_I0(IL, I, V, Gp, Rs, beta3):
     return (IL - I - Gp * V - Gp * Rs * I) / np.exp(beta3 * (V + Rs * I))
 
 
-
-
-
-
 if __name__ == "__main__":
 
-    aoi_list={}
-    gt_list={}
-    aoi=1
+    aoi_list = {}
+    gt_list = {}
+    aoi = 1
     while aoi < 200:
-        gt= glass_transmission_losses(aoi)
-        aoi_list[aoi]=gt
-        aoi=aoi+1
+        gt = glass_transmission_losses(aoi)
+        aoi_list[aoi] = gt
+        aoi = aoi + 1
 
-    #print(gt)
-    #get=pd.DataFrame.from_dict(aoi_list, orient='index')
-    #print(get)
+    # print(gt)
+    # get=pd.DataFrame.from_dict(aoi_list, orient='index')
+    # print(get)
     plt.plot(aoi_list)
     plt.show()

@@ -34,7 +34,7 @@ def load_era5_weatherdata(lat, lon, year, variable):
         cds_client=None,
     )
     logging.info("era5 weatherdata successfully loaded.")
-    if variable == 'pvcompare':
+    if variable == "pvcompare":
         weather_df = format_pvcompare(weather_xarray)
         spa = pvlib.solarposition.spa_python(
             time=weather_df.index, latitude=lat, longitude=lon
@@ -42,7 +42,7 @@ def load_era5_weatherdata(lat, lon, year, variable):
         weather_df["dni"] = pvlib.irradiance.dirint(
             weather_df["ghi"], solar_zenith=spa["zenith"], times=weather_df.index
         ).fillna(0)
-    elif variable == 'perosi':
+    elif variable == "perosi":
         weather_df = format_perosi(weather_xarray)
     logging.info(f"weatherdata successfully converted into {variable} format.")
     return weather_df
@@ -87,8 +87,8 @@ def get_era5_data_from_datespan_and_position(
         variable = ["fdir", "ssrd", "2t", "10u", "10v", "tcwv"]
     elif variable == "pvlib":
         variable = ["fdir", "ssrd", "2t", "10u", "10v"]
-    elif variable =="perosi":
-        variable = ["relative_humidity","2t", "10u", "10v"]
+    elif variable == "perosi":
+        variable = ["relative_humidity", "2t", "10u", "10v"]
 
     return get_cds_data_from_datespan_and_position(**locals())
 
@@ -156,6 +156,7 @@ def format_pvcompare(ds):
 
     return df
 
+
 def format_perosi(ds):
     """
     Format dataset to dataframe as required by the pvlib's ModelChain.
@@ -182,9 +183,9 @@ def format_perosi(ds):
     # convert temperature to Celsius (from Kelvin)
     ds["temp_air"] = ds.t2m - 273.15
 
-#    ds["relative_humidity"] = (ds.r).assign_attrs(
-#        units="%", long_name="relative_humidity"
-#    )
+    #    ds["relative_humidity"] = (ds.r).assign_attrs(
+    #        units="%", long_name="relative_humidity"
+    #    )
 
     # drop not needed variables
     pvlib_vars = ["wind_speed", "temp_air"]
@@ -210,6 +211,7 @@ def format_perosi(ds):
     df.dropna(inplace=True)
 
     return df
+
 
 def weather_df_from_era5(era5_netcdf_filename, lib, start=None, end=None):
     """
@@ -250,8 +252,7 @@ def weather_df_from_era5(era5_netcdf_filename, lib, start=None, end=None):
         df = format_perosi(ds)
     else:
         raise ValueError(
-            "Unknown value for `lib`. "
-            "It must be either 'pvcompare' or 'perosi'."
+            "Unknown value for `lib`. " "It must be either 'pvcompare' or 'perosi'."
         )
 
     # drop latitude and longitude from index in case a single location
@@ -269,4 +270,6 @@ if __name__ == "__main__":
     latitude = 40.3
     longitude = 5.4
 
-    df = load_era5_weatherdata(lat=latitude, lon=longitude, year=2015, variable="perosi")
+    df = load_era5_weatherdata(
+        lat=latitude, lon=longitude, year=2015, variable="perosi"
+    )

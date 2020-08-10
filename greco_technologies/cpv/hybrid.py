@@ -153,7 +153,7 @@ def hybrid_weather_data(weather_loc, lat, lon, surface_tilt, surface_azimuth):
     weather_smallaoi["dni"] = 0
     weather_bigaoi = weather_loc[
         weather_loc.index.isin(bigaoi.index)
-    ]                                                                           # todo: adjust DNI for AOI>60°: Durchnitt über Fläche
+    ]  # todo: adjust DNI for AOI>60°: Durchnitt über Fläche
     calculated_weather = pd.concat([weather_smallaoi, weather_bigaoi])
     calculated_weather.sort_index(inplace=True)
 
@@ -170,21 +170,16 @@ def hybrid_weather_data(weather_loc, lat, lon, surface_tilt, surface_azimuth):
     calculated_weather["dhi"] = calculated_weather["perez_diffuse"] + ground_diffuse
     calculated_weather.fillna(0, inplace=True)
 
-    return calculated_weather[[
-            "wind_speed",
-            "temp_air",
-            "ghi",
-            "dhi",
-            "dni",
-            "aoi",
-            "airmass"]]
+    return calculated_weather[
+        ["wind_speed", "temp_air", "ghi", "dhi", "dni", "aoi", "airmass"]
+    ]
 
 
 def create_si_time_series(lat, lon, weather, surface_azimuth, surface_tilt):
 
-    #load example module from sandia library
-    sandia_modules = pvlib.pvsystem.retrieve_sam('SandiaMod')
-    module = sandia_modules['Canadian_Solar_CS5P_220M___2009_']
+    # load example module from sandia library
+    sandia_modules = pvlib.pvsystem.retrieve_sam("SandiaMod")
+    module = sandia_modules["Canadian_Solar_CS5P_220M___2009_"]
     # prepare dictionary with poa_global, poa_direct_poa_diffuse, absolute_airmass, aoi
     hybrid_weather = hybrid_weather_data(
         weather,
@@ -205,7 +200,7 @@ def create_si_time_series(lat, lon, weather, surface_azimuth, surface_tilt):
         module=module,
     )
 
-    temp_params = TEMPERATURE_MODEL_PARAMETERS['sapm']['open_rack_glass_glass']
+    temp_params = TEMPERATURE_MODEL_PARAMETERS["sapm"]["open_rack_glass_glass"]
 
     temp_cell = pvlib.temperature.sapm_cell(
         poa_global=hybrid_weather["ghi"],
@@ -215,9 +210,7 @@ def create_si_time_series(lat, lon, weather, surface_azimuth, surface_tilt):
     ).fillna(0)
 
     output = pvsystem.sapm(
-        effective_irradiance=effective_irradiance,
-        temp_cell=temp_cell,
-        module=module,
+        effective_irradiance=effective_irradiance, temp_cell=temp_cell, module=module,
     )
 
     return output.p_mp
@@ -225,7 +218,7 @@ def create_si_time_series(lat, lon, weather, surface_azimuth, surface_tilt):
 
 if __name__ == "__main__":
 
-    #load example weather data
+    # load example weather data
     filename = os.path.abspath(
         "/home/adminlocal/Dokumente/greco_env/pvcompare/pvcompare/data/inputs/weatherdata.csv"
     )
@@ -236,18 +229,17 @@ if __name__ == "__main__":
     weather_df["dni"] = weather_df["ghi"] - weather_df["dhi"]
 
     ds = create_si_time_series(
-            lat=52.11113,
-            lon=12.48062,
-            weather=weather_df,
-            surface_azimuth=180,
-            surface_tilt=30,
-        )
+        lat=52.11113,
+        lon=12.48062,
+        weather=weather_df,
+        surface_azimuth=180,
+        surface_tilt=30,
+    )
     plt.plot(ds)
 
     # dh = create_hybrid_time_series(
     #     lat=40.3, lon=5.4, weather=weather_df, surface_tilt=25,
     #     surface_azimuth=180)
     # plt.plot(dh, "-b", alpha=0.7)
-
 
     plt.show()

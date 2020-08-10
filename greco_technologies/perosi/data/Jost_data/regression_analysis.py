@@ -1,14 +1,9 @@
-
 import numpy as np
 from sklearn import linear_model
 from sklearn.metrics import mean_squared_error
 import math
 import pandas as pd
 import matplotlib.pyplot as plt
-
-
-
-
 
 
 def get_single_util_factor(x, thld, m_low, m_high):
@@ -43,7 +38,7 @@ def get_single_util_factor(x, thld, m_low, m_high):
     return single_uf
 
 
-def calc_uf_lines(x, y, datatype = 'airmass', limit = 200):
+def calc_uf_lines(x, y, datatype="airmass", limit=200):
     """
     Calculates the parameters of two regression lines for a utilization factor
     specified by datatype.
@@ -78,10 +73,10 @@ def calc_uf_lines(x, y, datatype = 'airmass', limit = 200):
         limit between the two regression lines of the utilization factor.
     """
 
-    if datatype == 'airmass':
+    if datatype == "airmass":
         return calc_two_regression_lines(x, y, limit)
 
-    elif datatype == 'temp_air':
+    elif datatype == "temp_air":
         m_low, n_low, rmsd_low = calc_regression_line(x, y)
         n_high = m_low * limit + n_low
         return m_low, n_low, 0, n_high, limit
@@ -90,7 +85,7 @@ def calc_uf_lines(x, y, datatype = 'airmass', limit = 200):
         return 0, 0, 0, 0, 0
 
 
-def calc_two_regression_lines(x, y, limit = 200):
+def calc_two_regression_lines(x, y, limit=200):
     """
     Calculates the parameters of two regression lines for the composed
     utilization factors.
@@ -146,11 +141,11 @@ def calc_two_regression_lines(x, y, limit = 200):
                     y_aux2.append(y[j])
 
             # Regression lines are calculated for the two sets.
-            m_low_temp, n_low_temp, rmsd_low_temp = calc_regression_line(
-                x_aux1, y_aux1)
+            m_low_temp, n_low_temp, rmsd_low_temp = calc_regression_line(x_aux1, y_aux1)
 
             m_high_temp, n_high_temp, rmsd_high_temp = calc_regression_line(
-                x_aux2, y_aux2)
+                x_aux2, y_aux2
+            )
 
             # Less suitable regression lines are rejected.
             rmsd_temp = rmsd_low_temp + rmsd_high_temp
@@ -239,20 +234,25 @@ def calc_regression_line(x, y):
 def calculate_UF(data, filter=False, plot_UF=True):
 
     if filter == True:
-        mean_am=data['relative_airmass'].mean()
-        airmass = data[(data['relative_airmass'] >= mean_am-0.1) & (df['relative_airmass'] < mean_am+0.1)]
-        mean_temp=data['temp'].mean()
-        temperature= data[(data['temp'] >= mean_temp-2.5) & (df['temp'] < mean_temp+2.5)]
-        power=data['output']
+        mean_am = data["relative_airmass"].mean()
+        airmass = data[
+            (data["relative_airmass"] >= mean_am - 0.1)
+            & (df["relative_airmass"] < mean_am + 0.1)
+        ]
+        mean_temp = data["temp"].mean()
+        temperature = data[
+            (data["temp"] >= mean_temp - 2.5) & (df["temp"] < mean_temp + 2.5)
+        ]
+        power = data["output"]
 
     else:
-        power = data['output']
-        airmass = data['relative_airmass']
-        temperature = data['temp']
+        power = data["output"]
+        airmass = data["relative_airmass"]
+        temperature = data["temp"]
 
     m_low_am, n_low_am, m_high_am, n_high_am, thld_am = calc_two_regression_lines(
-        airmass,
-        power)
+        airmass, power
+    )
 
     x = np.arange(1, 5, 0.1)
     y1 = m_low_am * x + n_low_am
@@ -260,31 +260,45 @@ def calculate_UF(data, filter=False, plot_UF=True):
 
     if plot_UF == True:
         import matplotlib.pyplot as plt
-        plt.plot(airmass, power, 'b.', data['relative_airmass'], data['output'],
-             'g.', x, y1, 'g', x, y2, 'r')
+
+        plt.plot(
+            airmass,
+            power,
+            "b.",
+            data["relative_airmass"],
+            data["output"],
+            "g.",
+            x,
+            y1,
+            "g",
+            x,
+            y2,
+            "r",
+        )
         plt.show()
 
-    uf_am=pd.Series()
+    uf_am = pd.Series()
     for i, row in data.iterrows():
-        uf_am[i]=get_single_util_factor(row['relative_airmass'], thld_am,
-                                                m_low_am, m_high_am)
+        uf_am[i] = get_single_util_factor(
+            row["relative_airmass"], thld_am, m_low_am, m_high_am
+        )
 
     # Carga y Procesado de Datos sin influencia de la Masa de Aire
 
-    m_low_temp, n_low_temp, m_high_temp, n_high_temp, thld_temp = calc_uf_lines(temperature,
-                                                           power,
-                                                           datatype='temp_air')
+    m_low_temp, n_low_temp, m_high_temp, n_high_temp, thld_temp = calc_uf_lines(
+        temperature, power, datatype="temp_air"
+    )
     x = np.arange(-10, 20, 1)
     y1 = m_low_temp * x + n_low_temp
 
     if plot_UF == True:
-        plt.plot(temperature , power, 'g.', x, y1, 'b')
+        plt.plot(temperature, power, "g.", x, y1, "b")
         plt.show()
-
 
     uf_temp = pd.Series()
     for i, row in data.iterrows():
-        uf_temp[i]=get_single_util_factor(row['temp'], thld_temp,
-                                                m_low_temp, m_high_temp)
+        uf_temp[i] = get_single_util_factor(
+            row["temp"], thld_temp, m_low_temp, m_high_temp
+        )
 
     return (uf_am, uf_temp)
