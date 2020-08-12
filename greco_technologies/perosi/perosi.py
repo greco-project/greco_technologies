@@ -147,6 +147,9 @@ def calculate_smarts_parameters(
             else:
                 if not spectrum.index.name == "Wvlgth":
                     spectrum.set_index("Wvlgth", inplace=True)
+
+                #scale spectrum to era5-ghi
+
                 # calculate Jsc
                 Jsc_lambda = (spectrum["Global_tilt_photon_irrad"] * EQE["EQE"]) * q
                 Jsc_lambda.fillna(0, inplace=True)
@@ -288,7 +291,7 @@ def create_pero_si_timeseries(
         cell_type = ["Korte_pero", "Korte_si"]
     else:
         logging.warning(
-            "The source_type you entered is not recognized. Please "
+            f"The cell_type is {cell_type}. It is not recognized. Please "
             "choose between 'Korte' and 'Chen'."
         )
 
