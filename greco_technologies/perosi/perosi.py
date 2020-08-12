@@ -287,7 +287,7 @@ def create_pero_si_timeseries(
     """
     if psi_type == "Chen":
         cell_type = ["Chen_pero", "Chen_si"]
-    if psi_type == "Korte":
+    elif psi_type == "Korte":
         cell_type = ["Korte_pero", "Korte_si"]
     else:
         logging.warning(
@@ -324,7 +324,6 @@ if __name__ == "__main__":
         surface_azimuth=180,
         surface_tilt=30,
         year=2015,
-        input_directory=None,
         number_hours=400,
         psi_type="Chen",
     )
@@ -334,7 +333,6 @@ if __name__ == "__main__":
         surface_azimuth=180,
         surface_tilt=30,
         year=2015,
-        input_directory=None,
         number_hours=400,
         psi_type="Korte",
     )
