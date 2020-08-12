@@ -8,13 +8,9 @@ import pvlib
 import greco_technologies.perosi.pvlib_smarts as smarts
 import greco_technologies.perosi.era5 as era5
 
-try:
-    import importlib.resources as pkg_resources
-except ImportError:
-    # Try backported to PY<37 `importlib_resources`.
-    import importlib_resources as pkg_resources
+from importlib_resources import files
+import greco_technologies.perosi.data as data
 
-from . import data  # relative-import the *package* containing the templates
 
 from pandas.compat import StringIO
 
@@ -133,9 +129,8 @@ def calculate_smarts_parameters(
                     "or 'Chen_pero."
                 )
             EQE_filename = param.EQE_filename
-
-            EQE_str = pkg_resources.read_text(data, EQE_filename)
-            EQE_str1 = StringIO(EQE_str)
+            EQE_data = files(data).joinpath(EQE_filename).read_text()
+            EQE_str1 = StringIO(EQE_data)
             EQE = pd.read_csv(EQE_str1, sep=",", index_col=0)
 
             EQE = EQE / 100
@@ -175,7 +170,6 @@ def create_timeseries(
     year,
     cell_type,
     number_hours,
-    input_directory=None,
     plot=True,
 ):
 
