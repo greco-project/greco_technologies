@@ -291,7 +291,7 @@ def create_pero_si_timeseries(
         cell_type = ["Korte_pero", "Korte_si"]
     else:
         logging.warning(
-            f"The cell_type is {cell_type}. It is not recognized. Please "
+            f"The cell_type is {psi_type}. It is not recognized. Please "
             "choose between 'Korte' and 'Chen'."
         )
 
