@@ -1,9 +1,6 @@
 import pandas as pd
 import os
 
-from pathlib import Path
-
-
 
 def SMARTSSpectra(
     IOUT,
@@ -758,7 +755,7 @@ def _smartsAll(
     import pandas as pd
     import subprocess
 
-    file_directory = Path.cwd()
+    file_directory = os.path.dirname(__file__)
 
     try:
         os.remove(os.path.join(file_directory, "smarts295.inp.txt"))
@@ -1026,7 +1023,7 @@ def _smartsAll(
     ## Run SMARTS 2.9.5
     # dump = os.system('smarts295bat.exe')
 
-    file_directory = Path.cwd()
+    file_directory = os.path.dirname(__file__)
 
     command = ["yes | ./program.exe"]
     #    command = "./program.exe"
@@ -1040,7 +1037,7 @@ def _smartsAll(
         data = pd.read_csv(open_csv, delim_whitespace=True)
     except:
         print(
-            f"the file directory is {open_csv}. The directory is incorrect, the dataframe is empty."
+            f"the spectrum is empty."
         )
         data = pd.DataFrame()
 
