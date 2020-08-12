@@ -1,6 +1,9 @@
 import pandas as pd
 import os
 
+from pathlib import Path
+
+
 
 def SMARTSSpectra(
     IOUT,
@@ -755,7 +758,7 @@ def _smartsAll(
     import pandas as pd
     import subprocess
 
-    file_directory = os.path.dirname(__file__)
+    file_directory = Path.cwd()
 
     try:
         os.remove(os.path.join(file_directory, "smarts295.inp.txt"))
@@ -1023,7 +1026,7 @@ def _smartsAll(
     ## Run SMARTS 2.9.5
     # dump = os.system('smarts295bat.exe')
 
-    file_directory = os.path.dirname(__file__)
+    file_directory = Path.cwd()
 
     command = ["yes | ./program.exe"]
     #    command = "./program.exe"
