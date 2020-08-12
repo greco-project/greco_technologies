@@ -1,7 +1,9 @@
+feedinlib==0.0.12
 matplotlib
 numpy
 pandas>=0.24.1
 pvlib>=0.6.3
+xarray==0.15.0
 
 [dev]
 requests

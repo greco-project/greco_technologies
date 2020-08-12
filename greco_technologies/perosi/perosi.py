@@ -8,11 +8,8 @@ import pvlib
 import greco_technologies.perosi.pvlib_smarts as smarts
 import greco_technologies.perosi.era5 as era5
 
-from importlib_resources import files
-import greco_technologies.perosi.data as data
-
-
-from pandas.compat import StringIO
+import requests
+import io
 
 # Reconfiguring the logger here will also affect test running in the PyCharm IDE
 log_format = "%(asctime)s %(levelname)s %(filename)s:%(lineno)d %(message)s"
@@ -128,8 +125,14 @@ def calculate_smarts_parameters(
                     "choose either 'Korte_si', 'Korte_pero', 'Chen_si' "
                     "or 'Chen_pero."
                 )
-            EQE_filename = os.path.join("data",param.EQE_filename)
-            EQE = pd.read_csv(os.path.join(os.path.dirname(__file__), EQE_filename), sep=",", index_col=0)
+            # Downloading the csv file from your GitHub account
+
+            url = "https://raw.githubusercontent.com/greco-project/greco_technologies/dev/greco_technologies/perosi/data/CHEN_2020_EQE_curve_pero_corrected.csv"  # Make sure the url is the raw version of the file on GitHub
+            download = requests.get(url).content
+
+            # Reading the downloaded content and turning it into a pandas dataframe
+
+            EQE = pd.read_csv(io.StringIO(download.decode('utf-8')), sep=",", index_col=0)
 
             EQE = EQE / 100
 
