@@ -117,22 +117,25 @@ def calculate_smarts_parameters(
                 import greco_technologies.perosi.data.cell_parameters_korte_si as param
             elif x == "Chen_pero":
                 import greco_technologies.perosi.data.cell_parameters_Chen_2020_4T_pero as param
+
+                url = "https://raw.githubusercontent.com/greco-project/greco_technologies/dev/greco_technologies/perosi/data/CHEN_2020_EQE_curve_pero_corrected.csv"
             elif x == "Chen_si":
                 import greco_technologies.perosi.data.cell_parameters_Chen_2020_4T_si as param
+
+                url = "https://raw.githubusercontent.com/greco-project/greco_technologies/dev/greco_technologies/perosi/data/CHEN_2020_EQE_curve_si_corrected.csv"
             else:
                 logging.error(
                     "The cell type is not recognized. Please "
                     "choose either 'Korte_si', 'Korte_pero', 'Chen_si' "
                     "or 'Chen_pero."
                 )
-            # Downloading the csv file from your GitHub account
-
-            url = "https://raw.githubusercontent.com/greco-project/greco_technologies/dev/greco_technologies/perosi/data/CHEN_2020_EQE_curve_pero_corrected.csv"  # Make sure the url is the raw version of the file on GitHub
+            # Make sure the url is the raw version of the file on GitHub
             download = requests.get(url).content
-
             # Reading the downloaded content and turning it into a pandas dataframe
 
-            EQE = pd.read_csv(io.StringIO(download.decode('utf-8')), sep=",", index_col=0)
+            EQE = pd.read_csv(
+                io.StringIO(download.decode("utf-8")), sep=",", index_col=0
+            )
 
             EQE = EQE / 100
 
