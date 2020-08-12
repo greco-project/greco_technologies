@@ -128,10 +128,8 @@ def calculate_smarts_parameters(
                     "choose either 'Korte_si', 'Korte_pero', 'Chen_si' "
                     "or 'Chen_pero."
                 )
-            EQE_filename = param.EQE_filename
-            EQE_data = files(data).joinpath(EQE_filename).read_text()
-            EQE_str1 = StringIO(EQE_data)
-            EQE = pd.read_csv(EQE_str1, sep=",", index_col=0)
+            EQE_filename = os.path.join("data",param.EQE_filename)
+            EQE = pd.read_csv(os.path.join(os.path.dirname(__file__), EQE_filename), sep=",", index_col=0)
 
             EQE = EQE / 100
 
