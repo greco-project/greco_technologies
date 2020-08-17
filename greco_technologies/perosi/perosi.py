@@ -117,7 +117,6 @@ def calculate_smarts_parameters(
                 import greco_technologies.perosi.data.cell_parameters_korte_si as param
             elif x == "Chen_pero":
                 import greco_technologies.perosi.data.cell_parameters_Chen_2020_4T_pero as param
-
                 url = "https://raw.githubusercontent.com/greco-project/greco_technologies/dev/greco_technologies/perosi/data/CHEN_2020_EQE_curve_pero_corrected.csv"
             elif x == "Chen_si":
                 import greco_technologies.perosi.data.cell_parameters_Chen_2020_4T_si as param
@@ -130,15 +129,16 @@ def calculate_smarts_parameters(
                 )
             EQE_filename=param.EQE_filename
             path = os.path.join(os.path.dirname(__file__),"data", EQE_filename)
-            if os.path.isfile(path):
-                EQE = pd.read_csv(path, sep=",", index_col=0)
-            else:
-                # Make sure the url is the raw version of the file on GitHub
-                download = requests.get(url).content
-                # Reading the downloaded content and turning it into a pandas dataframe
-                EQE = pd.read_csv(
-                    io.StringIO(download.decode("utf-8")), sep=",", index_col=0
-                )
+            # if os.path.isfile(path):
+            #     EQE = pd.read_csv(path, sep=",", index_col=0)
+            # else:
+            #     # Make sure the url is the raw version of the file on GitHub
+            #     download = requests.get(url).content
+            #     # Reading the downloaded content and turning it into a pandas dataframe
+            #     EQE = pd.read_csv(
+            #         io.StringIO(download.decode("utf-8")), sep=",", index_col=0
+            #     )
+            EQE = pd.read_csv(path, sep=",", index_col=0)
 
             EQE = EQE / 100
 
