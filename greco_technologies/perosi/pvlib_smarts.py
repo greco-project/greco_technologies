@@ -1033,14 +1033,14 @@ def _smartsAll(
     ## Read SMARTS 2.9.5 Output File
     open_csv = os.path.join(file_directory, "smarts295.ext.txt")
 
-    try:
-        data = pd.read_csv(open_csv, delim_whitespace=True)
-    except Exception as e:
-        print(
-            f"the spectrum is empty."
-        )
-        print(e)
-        data = pd.DataFrame()
+    data = pd.read_csv(open_csv, delim_whitespace=True)
+    # try:
+    #     data = pd.read_csv(open_csv, delim_whitespace=True)
+    # except:
+    #     print(
+    #         f"the spectrum is empty."
+    #     )
+    #     data = pd.DataFrame()
 
     try:
         os.remove(os.path.join(file_directory, "smarts295.inp.txt"))
