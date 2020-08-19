@@ -128,7 +128,7 @@ def calculate_smarts_parameters(
                     "or 'Chen_pero."
                 )
             EQE_filename=param.EQE_filename
-            path = os.path.join(os.path.dirname(__file__),"data", EQE_filename)
+            path = os.path.join(os.path.abspath(os.path.dirname(__file__)),"data", EQE_filename)
             # if os.path.isfile(path):
             #     EQE = pd.read_csv(path, sep=",", index_col=0)
             # else:
