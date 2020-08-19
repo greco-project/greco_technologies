@@ -1023,7 +1023,7 @@ def _smartsAll(
     ## Run SMARTS 2.9.5
     # dump = os.system('smarts295bat.exe')
 
-    file_directory = os.path.dirname(__file__)
+    file_directory = os.path.abspath(os.path.dirname(__file__))
 
     command = ["yes | ./program.exe"]
     #    command = "./program.exe"
