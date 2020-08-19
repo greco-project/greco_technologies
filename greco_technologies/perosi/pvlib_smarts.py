@@ -1025,7 +1025,7 @@ def _smartsAll(
 
     file_directory = os.path.dirname(__file__)
 
-    command = ["yes | " + os.path.join(os.path.abspath(os.path.dirname(__file__)), "program.exe")]
+    command = ["yes | " + os.path.join(os.path.dirname(os.path.abspath(__file__)), "program.exe")]
 #    command = os.path.join(os.path.abspath(os.path.dirname(__file__)), "program.exe")
     p = subprocess.Popen(command, stdin=subprocess.PIPE, shell=True, cwd=file_directory)
     p.wait()
