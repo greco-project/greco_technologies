@@ -1023,24 +1023,24 @@ def _smartsAll(
     ## Run SMARTS 2.9.5
     # dump = os.system('smarts295bat.exe')
 
-    file_directory = os.path.abspath(os.path.dirname(__file__))
+    file_directory = os.path.dirname(__file__)
 
-    command = ["yes | ./program.exe"]
-    #    command = "./program.exe"
+    command = ["yes | " + os.path.join(os.path.abspath(os.path.dirname(__file__)), "program.exe")]
+#    command = os.path.join(os.path.abspath(os.path.dirname(__file__)), "program.exe")
     p = subprocess.Popen(command, stdin=subprocess.PIPE, shell=True, cwd=file_directory)
     p.wait()
 
     ## Read SMARTS 2.9.5 Output File
     open_csv = os.path.join(file_directory, "smarts295.ext.txt")
 
-    data = pd.read_csv(open_csv, delim_whitespace=True)
-    # try:
-    #     data = pd.read_csv(open_csv, delim_whitespace=True)
-    # except:
-    #     print(
-    #         f"the spectrum is empty."
-    #     )
-    #     data = pd.DataFrame()
+ #   data = pd.read_csv(open_csv, delim_whitespace=True)
+    try:
+        data = pd.read_csv(open_csv, delim_whitespace=True)
+    except:
+        print(
+            f"the spectrum is empty."
+        )
+        data = pd.DataFrame()
 
     try:
         os.remove(os.path.join(file_directory, "smarts295.inp.txt"))
