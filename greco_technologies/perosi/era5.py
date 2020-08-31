@@ -88,7 +88,7 @@ def get_era5_data_from_datespan_and_position(
     elif variable == "pvlib":
         variable = ["fdir", "ssrd", "2t", "10u", "10v"]
     elif variable == "perosi":
-        variable = ["relative_humidity", "2t", "10u", "10v"]
+        variable = ["fdir", "ssrd", "2t", "10u", "10v"]
 
     return get_cds_data_from_datespan_and_position(**locals())
 
@@ -183,12 +183,16 @@ def format_perosi(ds):
     # convert temperature to Celsius (from Kelvin)
     ds["temp_air"] = ds.t2m - 273.15
 
-    #    ds["relative_humidity"] = (ds.r).assign_attrs(
-    #        units="%", long_name="relative_humidity"
-    #    )
+    ds["dirhi"] = (ds.fdir / 3600.0).assign_attrs(units="W/m^2")
+    ds["ghi"] = (ds.ssrd / 3600.0).assign_attrs(
+        units="W/m^2", long_name="global horizontal irradiation"
+    )
+    ds["dhi"] = (ds.ghi - ds.dirhi).assign_attrs(
+        units="W/m^2", long_name="direct irradiation"
+    )
 
     # drop not needed variables
-    pvlib_vars = ["wind_speed", "temp_air"]
+    pvlib_vars = ["wind_speed", "temp_air", "ghi"]
     ds_vars = list(ds.variables)
     drop_vars = [
         _ for _ in ds_vars if _ not in pvlib_vars + ["latitude", "longitude", "time"]
@@ -207,7 +211,7 @@ def format_perosi(ds):
     df.sort_index(inplace=True)
     df = df.tz_localize("UTC", level=0)
 
-    df = df[["latitude", "longitude", "wind_speed", "temp_air"]]
+    df = df[["latitude", "longitude", "ghi", "wind_speed", "temp_air"]]
     df.dropna(inplace=True)
 
     return df

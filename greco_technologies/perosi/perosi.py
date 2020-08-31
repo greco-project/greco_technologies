@@ -66,7 +66,7 @@ def calculate_smarts_parameters(
     atmos_data = atmos_data.fillna(method="ffill")
 
     # define constant
-    q = 1.602176634 / 10 ** (19)  # in Coulomb = A*s
+    q = 1.602176634 / (10 ** 19)  # in Coulomb = A*s
     # define output data format
     iout = "8 12"
     # define counter for number of hours to be calculated
@@ -155,14 +155,15 @@ def calculate_smarts_parameters(
                 spectral_ghi_sum=spectrum["Global_tilted_irradiance"].sum()
                 ghi_corrected=spectral_ghi_sum - (spectral_ghi_sum - atmos_data.at[index, "ghi"])
                 diff_percent=ghi_corrected/(spectral_ghi_sum/100)
-                spectrum["Global_tilt_photon_corrected"] = spectrum["Global_tilt_photon_irrad"]/100 * diff_percent
-
+                spectrum["Global_tilt_photon_corrected"] = (spectrum["Global_tilt_photon_irrad"]/100 * diff_percent) # pro cm²
+                spectrum["Global_tilted_irradiance_corrected"]=(spectrum["Global_tilted_irradiance"]/100 * diff_percent)
 
                 # calculate Jsc
-                Jsc_lambda = (spectrum["Global_tilt_photon_corrected"] * EQE["EQE"]) * q
+                Jsc_lambda = ((spectrum["Global_tilt_photon_corrected"] * EQE["EQE"]) * q ) #Jsc pro cm²
                 Jsc_lambda.fillna(0, inplace=True)
-                result.at[index, "Jsc_" + str(x)] = Jsc_lambda.sum()  # in A/m²
+                result.at[index, "Jsc_" + str(x)] = Jsc_lambda.sum()  # in A/cm²
                 result.at[index, "ghi"] = atmos_data.at[index, "ghi"]# in W/m²
+                result.at[index, "ghi_spectrum_corrected"] = spectrum["Global_tilted_irradiance_corrected"].sum()  # in W/m²
 
         result.at[index, "temp"] = atmos_data.at[index, "temp_air"]
         result.at[index, "wind_speed"] = atmos_data.at[index, "wind_speed"]
@@ -205,7 +206,7 @@ def create_timeseries(
     :return: :pd.Dataframe()
         maximum power point of each time step for each cell type
     """
-    q = 1.602176634 / 10 ** (19)  # in Coulomb = A/s
+    q = 1.602176634 / (10 ** (19))  # in Coulomb = A/s
     kB = 1.380649 / 10 ** 23  # J/K
 
     # calculate spectral parameters from smarts and era5
@@ -238,7 +239,7 @@ def create_timeseries(
         elif x == "Chen_si":
             import greco_technologies.perosi.data.cell_parameters_Chen_2020_4T_si as param
 
-        nNsVth = param.n * param.Ns * (kB * (t_cell + 273.15) / q)
+        nNsVth = param.n * 1 * (kB * (t_cell + 273.15) / q)
 
         Isc = smarts_parameters["Jsc_" + str(x)] * param.A
         singlediode = pvlib.pvsystem.singlediode(
@@ -338,7 +339,7 @@ if __name__ == "__main__":
         lon=5.87,
         surface_azimuth=180,
         surface_tilt=30,
-        year=2015,
+        year=201,
         number_hours=400,
         psi_type="Korte",
     )

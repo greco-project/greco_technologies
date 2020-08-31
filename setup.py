@@ -19,6 +19,10 @@ setup(
     long_description=read("README.md"),
     packages=find_packages(),
     package_dir={"greco_technologies": "greco_technologies"},
+    package_data={
+        'greco_technologies': ['perosi/data/*.csv'],
+        'greco_technologies': ['perosi/*.exe']
+    },
     extras_require={"dev": ["sphinx", "sphinx_rtd_theme", "requests"]},
     install_requires=[
         "pvlib >= 0.6.3",
