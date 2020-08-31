@@ -117,9 +117,11 @@ def calculate_smarts_parameters(
                 import greco_technologies.perosi.data.cell_parameters_korte_si as param
             elif x == "Chen_pero":
                 import greco_technologies.perosi.data.cell_parameters_Chen_2020_4T_pero as param
+
                 url = "https://raw.githubusercontent.com/greco-project/greco_technologies/dev/greco_technologies/perosi/data/CHEN_2020_EQE_curve_pero_corrected.csv"
             elif x == "Chen_si":
                 import greco_technologies.perosi.data.cell_parameters_Chen_2020_4T_si as param
+
                 url = "https://raw.githubusercontent.com/greco-project/greco_technologies/dev/greco_technologies/perosi/data/CHEN_2020_EQE_curve_si_corrected.csv"
             else:
                 logging.error(
@@ -127,8 +129,10 @@ def calculate_smarts_parameters(
                     "choose either 'Korte_si', 'Korte_pero', 'Chen_si' "
                     "or 'Chen_pero."
                 )
-            EQE_filename=param.EQE_filename
-            path = os.path.join(os.path.dirname(os.path.abspath(__file__)),"data", EQE_filename)
+            EQE_filename = param.EQE_filename
+            path = os.path.join(
+                os.path.dirname(os.path.abspath(__file__)), "data", EQE_filename
+            )
             # if os.path.isfile(path):
             #     EQE = pd.read_csv(path, sep=",", index_col=0)
             # else:
@@ -151,19 +155,29 @@ def calculate_smarts_parameters(
                 if not spectrum.index.name == "Wvlgth":
                     spectrum.set_index("Wvlgth", inplace=True)
 
-                #scale spectrum to era5-ghi
-                spectral_ghi_sum=spectrum["Global_tilted_irradiance"].sum()
-                ghi_corrected=spectral_ghi_sum - (spectral_ghi_sum - atmos_data.at[index, "ghi"])
-                diff_percent=ghi_corrected/(spectral_ghi_sum/100)
-                spectrum["Global_tilt_photon_corrected"] = (spectrum["Global_tilt_photon_irrad"]/100 * diff_percent) # pro cm²
-                spectrum["Global_tilted_irradiance_corrected"]=(spectrum["Global_tilted_irradiance"]/100 * diff_percent)
+                # scale spectrum to era5-ghi
+                spectral_ghi_sum = spectrum["Global_tilted_irradiance"].sum()
+                ghi_corrected = spectral_ghi_sum - (
+                    spectral_ghi_sum - atmos_data.at[index, "ghi"]
+                )
+                diff_percent = ghi_corrected / (spectral_ghi_sum / 100)
+                spectrum["Global_tilt_photon_corrected"] = (
+                    spectrum["Global_tilt_photon_irrad"] / 100 * diff_percent
+                )  # pro cm²
+                spectrum["Global_tilted_irradiance_corrected"] = (
+                    spectrum["Global_tilted_irradiance"] / 100 * diff_percent
+                )
 
                 # calculate Jsc
-                Jsc_lambda = ((spectrum["Global_tilt_photon_corrected"] * EQE["EQE"]) * q ) #Jsc pro cm²
+                Jsc_lambda = (
+                    spectrum["Global_tilt_photon_corrected"] * EQE["EQE"]
+                ) * q  # Jsc pro cm²
                 Jsc_lambda.fillna(0, inplace=True)
                 result.at[index, "Jsc_" + str(x)] = Jsc_lambda.sum()  # in A/cm²
-                result.at[index, "ghi"] = atmos_data.at[index, "ghi"]# in W/m²
-                result.at[index, "ghi_spectrum_corrected"] = spectrum["Global_tilted_irradiance_corrected"].sum()  # in W/m²
+                result.at[index, "ghi"] = atmos_data.at[index, "ghi"]  # in W/m²
+                result.at[index, "ghi_spectrum_corrected"] = spectrum[
+                    "Global_tilted_irradiance_corrected"
+                ].sum()  # in W/m²
 
         result.at[index, "temp"] = atmos_data.at[index, "temp_air"]
         result.at[index, "wind_speed"] = atmos_data.at[index, "wind_speed"]

@@ -20,7 +20,8 @@ setup(
     packages=find_packages(),
     package_dir={"greco_technologies": "greco_technologies"},
     package_data={
-        'greco_technologies': ['perosi/data/*.csv'],
+        'greco_technologies': ['perosi/data/CHEN_2020_EQE_curve_pero_corrected.csv.csv'],
+        'greco_technologies': ['perosi/data/CHEN_2020_EQE_curve_si_corrected.csv.csv'],
         'greco_technologies': ['perosi/*.exe']
     },
     extras_require={"dev": ["sphinx", "sphinx_rtd_theme", "requests"]},
@@ -31,5 +32,6 @@ setup(
         "matplotlib",
         "xarray==0.15.0",
         "feedinlib==0.0.12",
+        "libgfortran"
     ],
 )
