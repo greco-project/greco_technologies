@@ -5,3 +5,4 @@ importlib
 importlib_resources
 pandas==0.24.2
 pathlib
+pvlib
