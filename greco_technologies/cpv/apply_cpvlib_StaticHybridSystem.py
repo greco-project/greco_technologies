@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 
 import pvlib
 import pandas as pd
-import cpvlib.cpvlib
+import cpvlib.cpvlib as cpvlib
 from greco_technologies.cpv.inputs import mod_params_cpv, mod_params_diffuse
 
 
