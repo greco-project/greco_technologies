@@ -1,11 +1,11 @@
 # SI
 Ns = 20000  # Number of cells in series
 A = 0.49 * Ns  # Area of the solar cell in cm²
-I_0 = 1 / 10 ** (13) * Ns
+I_0 = (1 / (10 ** (13))) * Ns
 Isc_ref = (17.2 / 1000) * Ns
 
 rs = 1.4 / Ns
-rsh = 6230 / Ns
+rsh = 7800 / Ns
 eg = (1.24 * 1.602176634) / (10 ** 19)  # eV
 n = 1
 temp_ref = 25  # °C
