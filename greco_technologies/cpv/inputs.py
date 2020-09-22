@@ -52,14 +52,12 @@ mod_params_diffuse = {
     "EgRef": 1.121,
     "irrad_ref": 1000,
     "temp_ref": 25,
-    "cells_in_series": 4, # 60,
+    "cells_in_series": 4,  # 60,
     "eta_m": 0.1,  # pvsyst_celltemp() default value
     "alpha_absorption": 0.9,  # pvsyst_celltemp() default value
-    "v_mp": 0,                                                      #todo: correct this value
+    "v_mp": 0,  # todo: correct this value
     "i_mp": 0,
 }
-
-
 
 
 # elif cpv_type == "m300":
@@ -93,5 +91,4 @@ mod_params_diffuse = {
 #         "weight_am": 0.2,
 #         "weight_temp": 0.8,
 #     }
-#module_params.update(UF_parameters)
-
+# module_params.update(UF_parameters)

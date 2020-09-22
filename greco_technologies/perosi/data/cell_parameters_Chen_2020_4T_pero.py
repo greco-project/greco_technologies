@@ -1,11 +1,11 @@
 # PERO
 Ns = 20000  # Number of cells in series
 A = 0.49 * Ns  # Area of the solar cell in cm²
-I_0 = 7.6 / 10 ** (15) * Ns
+I_0 = (7.6 / (10 ** (15))) * Ns
 Isc_ref = (22.3 / 1000) * Ns  # A for 700 nm thickness
 
 rs = 3.2 / Ns
-rsh = 6230 / Ns
+rsh = 7800 / Ns  # calculated was 6230
 eg = (1.636 * 1.602176634) / (10 ** 19)  # eV
 n = 1.5
 temp_ref = 25  # °C
