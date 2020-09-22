@@ -82,7 +82,7 @@ def create_cpv_time_series(lat, lon, weather, surface_azimuth, surface_tilt):
         dii=weather["dii_effective"],
         poa_diffuse_static=weather["poa_diffuse_static_effective"],
         temp_air=weather["temp_air"],
-        wind_speed=weather["wind_speed"]
+        wind_speed=weather["wind_speed"],
     )
 
     # calcparams_pvsyst
@@ -91,7 +91,7 @@ def create_cpv_time_series(lat, lon, weather, surface_azimuth, surface_tilt):
         diode_parameters_diffuse,
     ) = static_hybrid_sys.calcparams_pvsyst(
         dii=weather["dii_effective"],
-        poa_diffuse_static=weather["poa_diffuse_static_effective"],
+#        poa_diffuse_static=weather["poa_diffuse_static_effective"],
         temp_cell_cpv=weather["temp_cell_35"],
         temp_cell_diffuse=weather["temp_cell_diffuse"],
     )
