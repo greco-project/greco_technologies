@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import pvlib
 import pandas as pd
 from cpvlib import cpvlib
-from greco_technologies.cpv.inputs import mod_params_cpv, mod_params_diffuse
+from greco_technologies.cpv.inputs import mod_params_cpv, mod_params_flatplate
 
 
 def create_cpv_time_series(lat, lon, weather, surface_azimuth, surface_tilt):
@@ -47,9 +47,9 @@ def create_cpv_time_series(lat, lon, weather, surface_azimuth, surface_tilt):
         surface_tilt=surface_tilt,
         surface_azimuth=surface_azimuth,
         module_cpv=None,
-        module_diffuse=None,
+        module_flatplate=None,
         module_parameters_cpv=mod_params_cpv,
-        module_parameters_diffuse=mod_params_diffuse,
+        module_parameters_flatplate=mod_params_flatplate,
         modules_per_string=1,
         strings_per_inverter=1,
         inverter=None,
@@ -62,7 +62,7 @@ def create_cpv_time_series(lat, lon, weather, surface_azimuth, surface_tilt):
     # get_effective_irradiance
     (
         weather["dii_effective"],
-        weather["poa_diffuse_static_effective"],
+        weather["poa_flatplate_static_effective"],
     ) = static_hybrid_sys.get_effective_irradiance(
         solar_zenith,
         solar_azimuth,
@@ -77,10 +77,10 @@ def create_cpv_time_series(lat, lon, weather, surface_azimuth, surface_tilt):
     # pvsyst_celltemp
     (
         weather["temp_cell_35"],
-        weather["temp_cell_diffuse"],
+        weather["temp_cell_flatplate"],
     ) = static_hybrid_sys.pvsyst_celltemp(
         dii=weather["dii_effective"],
-#        poa_diffuse_static=weather["poa_diffuse_static_effective"],
+        poa_flatplate_static=weather["poa_flatplate_static_effective"],
         temp_air=weather["temp_air"],
         wind_speed=weather["wind_speed"],
     )
@@ -88,17 +88,17 @@ def create_cpv_time_series(lat, lon, weather, surface_azimuth, surface_tilt):
     # calcparams_pvsyst
     (
         diode_parameters_cpv,
-        diode_parameters_diffuse,
+        diode_parameters_flatplate,
     ) = static_hybrid_sys.calcparams_pvsyst(
         dii=weather["dii_effective"],
-        poa_diffuse_static=weather["poa_diffuse_static_effective"],
+        poa_flatplate_static=weather["poa_flatplate_static_effective"],
         temp_cell_cpv=weather["temp_cell_35"],
-        temp_cell_diffuse=weather["temp_cell_diffuse"],
+        temp_cell_flatplate=weather["temp_cell_flatplate"],
     )
 
     # singlediode
-    dc_cpv, dc_diffuse = static_hybrid_sys.singlediode(
-        diode_parameters_cpv, diode_parameters_diffuse
+    dc_cpv, dc_flatplate = static_hybrid_sys.singlediode(
+        diode_parameters_cpv, diode_parameters_flatplate
     )
 
     # uf_global (uf_am, uf_temp_air)
@@ -110,11 +110,11 @@ def create_cpv_time_series(lat, lon, weather, surface_azimuth, surface_tilt):
 
     # Power
     # dc_cpv.p_mp.plot(label="cpv")
-    # dc_diffuse.p_mp.plot(label="diffuse")
+    # dc_flatplate.p_mp.plot(label="flatplate")
 
     # Energy
     energy_cpv = dc_cpv["p_mp"] * uf_cpv
-    energy_diffuse = dc_diffuse["p_mp"]
-    total = energy_cpv + energy_diffuse
+    energy_flatplate = dc_flatplate["p_mp"]
+    total = energy_cpv + energy_flatplate
 
     return total
