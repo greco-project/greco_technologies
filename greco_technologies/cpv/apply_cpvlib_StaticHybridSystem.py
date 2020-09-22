@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 
 import pvlib
 import pandas as pd
-import cpvlib
+from cpvlib import cpvlib
 from greco_technologies.cpv.inputs import mod_params_cpv, mod_params_diffuse
 
 
@@ -43,7 +43,7 @@ def create_cpv_time_series(lat, lon, weather, surface_azimuth, surface_tilt):
 
     #%%
     # StaticHybridSystem
-    static_hybrid_sys = cpvlib.cpvlib.cpvlib.StaticHybridSystem(
+    static_hybrid_sys = cpvlib.StaticHybridSystem(
         surface_tilt=surface_tilt,
         surface_azimuth=surface_azimuth,
         module_cpv=None,
