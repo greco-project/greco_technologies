@@ -21,6 +21,8 @@ mod_params_cpv = {
     "Area": 0.103,
     "v_mp": 33.5,
     "i_mp": 0.893,
+    "u_c": 29.0, #default value from https://pvlib-python.readthedocs.io/en/latest/generated/pvlib.temperature.pvsyst_cell.html#pvlib.temperature.pvsyst_cell
+    "u_v": 0.00
 }
 
 UF_parameters_cpv = {
@@ -57,6 +59,8 @@ mod_params_flatplate = {
     "alpha_absorption": 0.9,  # pvsyst_celltemp() default value
     "v_mp": 0,  # todo: correct this value
     "i_mp": 0,
+    "u_c": 29.0, #default value from https://pvlib-python.readthedocs.io/en/latest/generated/pvlib.temperature.pvsyst_cell.html#pvlib.temperature.pvsyst_cell
+    "u_v": 0.00
 }
 
 
