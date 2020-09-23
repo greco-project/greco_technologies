@@ -1,5 +1,5 @@
 git+https://github.com/greco-project/cpvtopvlib.git@master
-git+https://github.com/isi-ies-group/cpvlib.git@ieee-talk
+git+https://github.com/isi-ies-group/cpvlib.git
 feedinlib==0.1.0rc2
 importlib
 importlib_resources
