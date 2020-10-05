@@ -18,11 +18,12 @@ mod_params_cpv = {
     "cells_in_parallel": 48,
     "eta_m": 0.32,
     "alpha_absorption": 0.9,
-    "Area": 0.103,
+    "Area": 1.31,
     "v_mp": 33.5,
     "i_mp": 0.893,
     "u_c": 29.0, #default value from https://pvlib-python.readthedocs.io/en/latest/generated/pvlib.temperature.pvsyst_cell.html#pvlib.temperature.pvsyst_cell
-    "u_v": 0.00
+    "u_v": 0.00,
+    "alpha" : 0.11, #temperature coefficient for the whole module see INS datasheet not used
 }
 
 UF_parameters_cpv = {
@@ -44,7 +45,7 @@ mod_params_cpv.update(UF_parameters_cpv)
 mod_params_flatplate = {
     "gamma_ref": 1.1,
     "mu_gamma": -0.0003,
-    "I_L_ref": 5.5,
+    "I_L_ref": 8,
     "I_o_ref": 2.2e-9,
     "R_sh_ref": 200,
     "R_sh_0": 8700,
@@ -54,13 +55,11 @@ mod_params_flatplate = {
     "EgRef": 1.121,
     "irrad_ref": 1000,
     "temp_ref": 25,
-    "cells_in_series": 4,  # 60,
-    "eta_m": 0.1,  # pvsyst_celltemp() default value
-    "alpha_absorption": 0.9,  # pvsyst_celltemp() default value
-    "v_mp": 0,  # todo: correct this value
-    "i_mp": 0,
-    "u_c": 29.0, #default value from https://pvlib-python.readthedocs.io/en/latest/generated/pvlib.temperature.pvsyst_cell.html#pvlib.temperature.pvsyst_cell
-    "u_v": 0.00
+    "cells_in_series": 4, # 60,
+    "eta_m": 0.95,  # pvsyst_celltemp() default value
+    "alpha_absorption": 0.97,  # pvsyst_celltemp() default value
+    "i_mp":0.0,
+    "v_mp":0.0,
 }
 
 
