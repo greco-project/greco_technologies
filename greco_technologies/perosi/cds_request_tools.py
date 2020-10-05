@@ -83,7 +83,7 @@ def _get_cds_data(
     ), "Need to specify at least 'variable', 'year' and 'month'"
 
     # Send the data request to the server
-    result = cds_client.retrieve(dataset_name, request,)
+    result = cds_client.retrieve(dataset_name, request)
 
     no_target_file_provided = target_file is None
     # Create a file in a secure way if a target filename was not provided
@@ -259,7 +259,7 @@ def _format_cds_request_position(latitude, longitude, grid=None):
     # Find the nearest point on the grid corresponding to the given latitude
     # and longitude
     grid_point = xr.Dataset(
-        {"lat": np.arange(90, -90, -grid[0]), "lon": np.arange(-180, 180.0, grid[1]),}
+        {"lat": np.arange(90, -90, -grid[0]), "lon": np.arange(-180, 180.0, grid[1])}
     ).sel(lat=latitude, lon=longitude, method="nearest")
 
     # Prepare an area which consists of only one grid point

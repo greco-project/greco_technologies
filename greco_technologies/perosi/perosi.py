@@ -77,10 +77,9 @@ def calculate_smarts_parameters(
         solar_azimuth=spa["azimuth"],
         dni=atmos_data["dni"],
         ghi=atmos_data["ghi"],
-        dhi=atmos_data["dhi"])
-    atmos_data["poa_global"]=poa["poa_global"]
-
-
+        dhi=atmos_data["dhi"],
+    )
+    atmos_data["poa_global"] = poa["poa_global"]
 
     # define constant
     q = 1.602176634 / (10 ** 19)  # in Coulomb = A*s
@@ -163,7 +162,6 @@ def calculate_smarts_parameters(
             else:
                 if not spectrum.index.name == "Wvlgth":
                     spectrum.set_index("Wvlgth", inplace=True)
-
 
                 # scale spectrum to era5-ghi
                 spectral_ghi_sum = spectrum["Global_tilted_irradiance"].sum()

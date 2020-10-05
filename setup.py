@@ -20,7 +20,14 @@ setup(
     packages=find_packages(),
     package_dir={"greco_technologies": "greco_technologies"},
     package_data={
-        'greco_technologies': ['perosi/*.exe', 'perosi/Gases/*.dat', 'perosi/Solar/*.dat', 'perosi/Albedo/*.dat', 'perosi/data/CHEN_2020_EQE_curve_pero_corrected.csv', 'perosi/data/CHEN_2020_EQE_curve_si_corrected.csv']
+        "greco_technologies": [
+            "perosi/*.exe",
+            "perosi/Gases/*.dat",
+            "perosi/Solar/*.dat",
+            "perosi/Albedo/*.dat",
+            "perosi/data/CHEN_2020_EQE_curve_pero_corrected.csv",
+            "perosi/data/CHEN_2020_EQE_curve_si_corrected.csv",
+        ]
     },
     extras_require={"dev": ["sphinx", "sphinx_rtd_theme", "requests"]},
     install_requires=[
@@ -29,6 +36,6 @@ setup(
         "numpy",
         "matplotlib",
         "xarray",
-        "feedinlib==0.1.0rc2"
+        "feedinlib==0.1.0rc2",
     ],
 )

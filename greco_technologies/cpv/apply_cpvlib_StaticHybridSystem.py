@@ -118,7 +118,6 @@ def create_cpv_time_series(lat, lon, weather, surface_azimuth, surface_tilt):
 
     # add temperature correction -> not, because its already covered in uf_temp
 
-
     total = energy_cpv + energy_flatplate
 
     import matplotlib.pyplot as plt
@@ -138,6 +137,6 @@ def create_cpv_time_series(lat, lon, weather, surface_azimuth, surface_tilt):
     plt.savefig("/home/inia/Dokumente/greco_env/dni_plot.png")
 
     # add CTM losses
-    total = total - (total / 100)*5
+    total = total - (total / 100) * 5
 
     return total

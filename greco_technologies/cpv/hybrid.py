@@ -210,7 +210,7 @@ def create_si_time_series(lat, lon, weather, surface_azimuth, surface_tilt):
     ).fillna(0)
 
     output = pvsystem.sapm(
-        effective_irradiance=effective_irradiance, temp_cell=temp_cell, module=module,
+        effective_irradiance=effective_irradiance, temp_cell=temp_cell, module=module
     )
 
     return output.p_mp
