@@ -65,6 +65,23 @@ def calculate_smarts_parameters(
     atmos_data["davt"] = atmos_data["temp_air"].resample("D").mean()
     atmos_data = atmos_data.fillna(method="ffill")
 
+    # calculate poa_total for tilted surface
+    spa = pvlib.solarposition.spa_python(
+        time=atmos_data.index, latitude=lat, longitude=lon
+    )
+
+    poa = pvlib.irradiance.get_total_irradiance(
+        surface_tilt=surface_tilt,
+        surface_azimuth=surface_azimuth,
+        solar_zenith=spa["zenith"],
+        solar_azimuth=spa["azimuth"],
+        dni=atmos_data["dni"],
+        ghi=atmos_data["ghi"],
+        dhi=atmos_data["dhi"])
+    atmos_data["poa_global"]=poa["poa_global"]
+
+
+
     # define constant
     q = 1.602176634 / (10 ** 19)  # in Coulomb = A*s
     # define output data format
@@ -133,15 +150,7 @@ def calculate_smarts_parameters(
             path = os.path.join(
                 os.path.dirname(os.path.abspath(__file__)), "data", EQE_filename
             )
-            # if os.path.isfile(path):
-            #     EQE = pd.read_csv(path, sep=",", index_col=0)
-            # else:
-            #     # Make sure the url is the raw version of the file on GitHub
-            #     download = requests.get(url).content
-            #     # Reading the downloaded content and turning it into a pandas dataframe
-            #     EQE = pd.read_csv(
-            #         io.StringIO(download.decode("utf-8")), sep=",", index_col=0
-            #     )
+
             EQE = pd.read_csv(path, sep=",", index_col=0)
 
             EQE = EQE / 100
@@ -155,10 +164,11 @@ def calculate_smarts_parameters(
                 if not spectrum.index.name == "Wvlgth":
                     spectrum.set_index("Wvlgth", inplace=True)
 
+
                 # scale spectrum to era5-ghi
                 spectral_ghi_sum = spectrum["Global_tilted_irradiance"].sum()
                 ghi_corrected = spectral_ghi_sum - (
-                    spectral_ghi_sum - atmos_data.at[index, "ghi"]
+                    spectral_ghi_sum - atmos_data.at[index, "poa_global"]
                 )
                 diff_percent = ghi_corrected / (spectral_ghi_sum / 100)
                 spectrum["Global_tilt_photon_corrected"] = (
@@ -174,7 +184,7 @@ def calculate_smarts_parameters(
                 ) * q  # Jsc pro cm²
                 Jsc_lambda.fillna(0, inplace=True)
                 result.at[index, "Jsc_" + str(x)] = Jsc_lambda.sum()  # in A/cm²
-                result.at[index, "ghi"] = atmos_data.at[index, "ghi"]  # in W/m²
+                result.at[index, "ghi"] = atmos_data.at[index, "poa_global"]  # in W/m²
                 result.at[index, "ghi_spectrum_corrected"] = spectrum[
                     "Global_tilted_irradiance_corrected"
                 ].sum()  # in W/m²
