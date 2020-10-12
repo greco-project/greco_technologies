@@ -333,7 +333,6 @@ def create_pero_si_timeseries(
         year=year,
         cell_type=cell_type,
         number_hours=number_hours,
-        plot=True,
     )
     output = timeseries.iloc[:, 0] + timeseries.iloc[:, 1]
 
