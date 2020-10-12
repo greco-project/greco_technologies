@@ -27,7 +27,6 @@ def calculate_smarts_parameters(
     atmos_data,
     WLMN=350,
     WLMX=1200,
-    plot=True
 ):
 
     """
@@ -82,15 +81,6 @@ def calculate_smarts_parameters(
     )
 
     atmos_data["poa_global"] = poa["poa_global"]
-
-    if plot == True:
-        plt.plot(atmos_data["dni"], label="dni", alpha=0.6)
-        plt.plot(atmos_data["ghi"], label="ghi", alpha=0.6)
-        plt.plot(atmos_data["poa_global"], label="poa_global", alpha=0.6)
-        plt.xlabel("time")
-        plt.ylabel("W/m2")
-        plt.legend()
-        plt.savefig(f"./data/weather_plot_{year}_{lat}_{lon}.png")
 
     # define constant
     q = 1.602176634 / (10 ** 19)  # in Coulomb = A*s
@@ -217,7 +207,6 @@ def create_timeseries(
     year,
     cell_type,
     number_hours,
-    plot=True,
 ):
 
     """
